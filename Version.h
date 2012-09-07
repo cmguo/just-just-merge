@@ -1,9 +1,9 @@
 // Version.h
 
-#ifndef _PPBOX_SEGMNET_VERSION_H_
-#define _PPBOX_SEGMNET_VERSION_H_
+#ifndef _PPBOX_MERGE_VERSION_H_
+#define _PPBOX_MERGE_VERSION_H_
 
-#include "ppbox/segment/Define.h"
+#include "ppbox/merge/Define.h"
 
 #include <framework/system/AutoVersion.h>
 
@@ -13,4 +13,4 @@
 
 #include <tinyxml/Version.h>
 
-#endif // _PPBOX_SEGMNET_VERSION_H_
+#endif // _PPBOX_MERGE_VERSION_H_
