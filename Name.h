@@ -1,10 +1,10 @@
 // Name.h
 
-#ifndef _PPBOX_SEGMENT_NAME_H_
-#define _PPBOX_SEGMENT_NAME_H_
+#ifndef _PPBOX_MERGE_NAME_H_
+#define _PPBOX_MERGE_NAME_H_
 
-#include "ppbox/segment/Define.h"
+#include "ppbox/merge/Define.h"
 
 #include <framework/system/AutoName.h>
 
-#endif // _PPBOX_SEGMENT_NAME_H_
+#endif // _PPBOX_MERGE_NAME_H_
