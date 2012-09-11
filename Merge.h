@@ -58,7 +58,9 @@ namespace ppbox
             virtual void close(boost::system::error_code & ec);
 
         protected:
-            boost::uint64_t & cur_offset(void);
+            boost::uint64_t const & cur_offset(void) const;
+
+            void cur_offset(boost::uint64_t const & offset);
 
             ppbox::data::SegmentSource * source(void);
 

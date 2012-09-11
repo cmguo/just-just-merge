@@ -110,7 +110,7 @@ namespace ppbox
             assert(segment_source_->is_open(ec));
             std::size_t bytes_received = 
             segment_source_->read_some(cycle_buffers_->prepare(), ec);
-            cur_offset() += bytes_received;
+            cur_offset(cur_offset() + bytes_received);
             if (!ec) {
                 cycle_buffers_->commit(bytes_received);
             } else {
@@ -167,11 +167,12 @@ namespace ppbox
             }
 
             if (!ec || ec == boost::asio::error::would_block) {
-                cur_offset() = offset;
+                cur_offset(offset);
             }
             return ec;
         }
 
+        // buffer time计算的更准确需要优化忽略MP4头部位置
         boost::uint32_t Merge::get_buffer_time(void) const
         {
             return  cycle_buffers_->in_avail() * 
@@ -194,7 +195,7 @@ namespace ppbox
 
         std::size_t Merge::valid() const
         {
-            return 0;
+            return cur_offset();
         }
 
         std::size_t Merge::size() const
@@ -216,9 +217,14 @@ namespace ppbox
             source()->close(0, ec);
         }
 
-        boost::uint64_t & Merge::cur_offset(void)
+        boost::uint64_t const & Merge::cur_offset(void) const
         {
             return cur_offset_;
+        }
+
+        void Merge::cur_offset(boost::uint64_t const & offset)
+        {
+            cur_offset_ = offset;
         }
 
         SegmentSource * Merge::source(void)

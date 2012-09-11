@@ -1,7 +1,7 @@
 // BigheadMp4Merge.h
 
-#ifndef   _PPBOX_SEGMENT_BIGHEAD_MP4_Merge_H_
-#define   _PPBOX_SEGMENT_BIGHEAD_MP4_Merge_H_
+#ifndef   _PPBOX_MERGE_BIGHEAD_MP4_Merge_H_
+#define   _PPBOX_MERGE_BIGHEAD_MP4_Merge_H_
 
 #include "ppbox/merge/Merge.h"
 
@@ -34,4 +34,4 @@ namespace ppbox
     }
 }
 
-#endif // END _PPBOX_SEGMENT_BIGHEAD_MP4_Merge_H_
+#endif // END _PPBOX_MERGE_BIGHEAD_MP4_Merge_H_

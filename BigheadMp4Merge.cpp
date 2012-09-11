@@ -31,8 +31,10 @@ namespace ppbox
             response_type const & resp)
         {
             resp_ = resp;
-            Merge::async_open(
+            source()->async_open(
                 playlink, 
+                0, 
+                boost::uint64_t(-1), 
                 boost::bind(&BigheadMp4Merge::open_callback, this, _1));
         }
 
