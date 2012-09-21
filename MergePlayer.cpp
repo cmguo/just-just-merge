@@ -28,7 +28,7 @@ namespace ppbox
         }
 
 
-        boost::system::error_code MergePlayer::doing()
+        void MergePlayer::operator ()()
         {
             boost::system::error_code ec;
             assert(exit_);
@@ -40,7 +40,6 @@ namespace ppbox
             exit_ = true;
 
             resp_(ec);
-            return ec;
         }
 
         void MergePlayer::set(

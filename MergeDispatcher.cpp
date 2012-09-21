@@ -8,7 +8,6 @@
 using namespace framework::logger;
 
 #include <boost/bind.hpp>
-#include <boost/thread/thread.hpp>
 using namespace boost::system;
 
 namespace ppbox
@@ -16,11 +15,10 @@ namespace ppbox
     namespace merge
     {
         MergeDispatcher::MergeDispatcher(
-            util::daemon::Daemon & daemon)
-            : ppbox::common::Dispatcher(daemon)
-            , timer_(daemon.io_svc())
+            boost::asio::io_service & ios)
+            : ppbox::common::Dispatcher(ios)
             , player_(new MergePlayer())
-            , merge_(new BigheadMp4Merge(daemon.io_svc(),4*1024*1024))
+            , merge_(new BigheadMp4Merge(ios,4*1024*1024))
         {
         }
 
@@ -50,16 +48,6 @@ namespace ppbox
             merge_->close(ec);
         }
 
-        void MergeDispatcher::open_format(std::string const &format,boost::system::error_code& ec)
-        {
-            ec.clear();
-        }
-
-        void MergeDispatcher::close_format(boost::system::error_code& ec)
-        {
-            ec.clear();
-        }
-
         void MergeDispatcher::pause_moive(boost::system::error_code& ec)
         {
             ec.clear();
@@ -73,7 +61,7 @@ namespace ppbox
         void MergeDispatcher::async_play_playlink(ppbox::common::Session* session,ppbox::common::session_callback_respone const &resp)
         {
             player_->set(merge_,resp,session);
-            post(player_);
+            post(*player_);
         }
 
         void MergeDispatcher::cancel_play_playlink(boost::system::error_code& ec)
@@ -84,27 +72,12 @@ namespace ppbox
         void MergeDispatcher::async_buffering(ppbox::common::Session* session,ppbox::common::session_callback_respone const &resp)
         {
             player_->set(merge_,resp);
-            post(player_);
+            post(*player_);
         }
 
         void MergeDispatcher::cancel_buffering(boost::system::error_code& ec)
         {
             player_->stop();
-        }
-
-
-        void MergeDispatcher::async_wait(
-            boost::uint32_t wait_timer
-            , ppbox::common::session_callback_respone const &resp) 
-        {
-            //time
-            timer_.expires_from_now(boost::posix_time::seconds(wait_timer));
-            timer_.async_wait(resp);
-        }
-
-        void MergeDispatcher::cancel_wait(boost::system::error_code& ec)
-        {
-            timer_.cancel();
         }
 
         boost::system::error_code MergeDispatcher::get_media_info(

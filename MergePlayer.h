@@ -16,7 +16,11 @@ namespace ppbox
 
             MergePlayer();
             virtual ~MergePlayer();
-            virtual boost::system::error_code doing();
+
+
+            void operator ()();
+
+
             void set(
                 Merge *merge_tmp,
                 ppbox::common::session_callback_respone const &resp,
