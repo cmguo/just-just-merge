@@ -87,9 +87,16 @@ namespace ppbox
             boost::system::error_code & ec)
         {
             prepare(ec);
+            boost::uint32_t receives = 0;
             if (!ec) {
                 if (media_merge_impl_.ios && !media_merge_impl_.finished) {
-                    
+                    receives = media_merge_impl_.ios->readsome(
+                        (char*)&tmp_buffer_.at(0), 
+                        prepare_size_);
+                    buffers.push_back(boost::asio::buffer(tmp_buffer_, receives));
+                    if (media_merge_impl_.ios->eof()) {
+                        media_merge_impl_.finished = true;
+                    }
                 } else {
                     drop(read_size_);
                     std::size_t size = cycle_buffers_->in_avail();
@@ -103,11 +110,13 @@ namespace ppbox
                         }
                         buffer_copy(cycle_buffers_->data(read_size_), buffers);
                     }
+                    receives = read_size_;
                 }
             } else {
                 read_size_ = 0;
+                receives = read_size_;
             }
-            return read_size_;
+            return receives;
         }
 
         error_code Merge::prepare(
@@ -290,6 +299,12 @@ namespace ppbox
         void Merge::response(error_code const & ec)
         {
             resp_(ec);
+        }
+
+        std::vector<ppbox::data::Strategy *> const & 
+            Merge::strategys(void) const
+        {
+            return strategys_;
         }
 
         void Merge::add_strategy(ppbox::data::Strategy * strategy)
