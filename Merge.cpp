@@ -27,6 +27,7 @@ namespace ppbox
             , buffer_size_(framework::memory::PrivateMemory::align_page(buffer_size))
             , prepare_size_(10240)
             , read_size_(0)
+            , head_size_(0)
             , cur_offset_(0)
             , segment_source_(new SegmentSource(io_srv_))
             , cur_pos_(0)
@@ -35,6 +36,7 @@ namespace ppbox
             mutable_buffers_1 buffers(buffer_, buffer_size_);
             cycle_buffers_ = new util::buffers::CycleBuffers< 
                 boost::asio::mutable_buffers_1 >(buffers);
+            tmp_buffer_.resize(prepare_size_);
         }
 
         Merge::~Merge()
@@ -48,12 +50,13 @@ namespace ppbox
                 segment_source_ = NULL;
             }
             for (boost::uint32_t i = 0; i < strategys_.size(); i++) {
-                SourceStrategy::destory(strategys_[i]);
+                Strategy::destory(strategys_[i]);
             }
         }
 
         void Merge::async_open(
             framework::string::Url const & playlink, 
+            std::iostream * ios, 
             response_type const & resp)
         {
             response(resp);
@@ -69,10 +72,9 @@ namespace ppbox
             if (ec) {
                 LOG_WARN("[open_callback] ec: " << ec.message());
             } else {
-                SourceStrategy * strategy = SourceStrategy::create(
+                Strategy * strategy = Strategy::create(
                     "full", 
-                    segment_source_->segments(),
-                    segment_source_->video_info());
+                    *segment_source_->media());
                 add_strategy(strategy);
                 segment_source_->set_strategy(strategys()[cur_pos_]);
                 segment_source_->reset();
@@ -85,18 +87,22 @@ namespace ppbox
             boost::system::error_code & ec)
         {
             prepare(ec);
-            if (!ec || ec == boost::asio::error::would_block) {
-                drop(read_size_);
-                std::size_t size = cycle_buffers_->in_avail();
-                if (size == 0) {
-                    read_size_ = 0;
+            if (!ec) {
+                if (media_merge_impl_.ios && !media_merge_impl_.finished) {
+                    
                 } else {
-                    if (prepare_size_ < size) {
-                        read_size_ = prepare_size_;
+                    drop(read_size_);
+                    std::size_t size = cycle_buffers_->in_avail();
+                    if (size == 0) {
+                        read_size_ = 0;
                     } else {
-                        read_size_ = size;
+                        if (prepare_size_ < size) {
+                            read_size_ = prepare_size_;
+                        } else {
+                            read_size_ = size;
+                        }
+                        buffer_copy(cycle_buffers_->data(read_size_), buffers);
                     }
-                    buffer_copy(cycle_buffers_->data(read_size_), buffers);
                 }
             } else {
                 read_size_ = 0;
@@ -108,19 +114,44 @@ namespace ppbox
             error_code & ec)
         {
             assert(segment_source_->is_open(ec));
-            std::size_t bytes_received = 
-            segment_source_->read_some(cycle_buffers_->prepare(), ec);
-            cur_offset(cur_offset() + bytes_received);
-            if (!ec) {
-                cycle_buffers_->commit(bytes_received);
+            std::size_t bytes_received = 0;
+            if (media_merge_impl_.merge_impl) {
+                assert(media_merge_impl_.ios);
+                bytes_received = segment_source_->read_some(
+                    boost::asio::buffer(tmp_buffer_), 
+                    ec);
+                if (!ec) {
+                    media_merge_impl_.ios->write((char*)&tmp_buffer_, bytes_received);
+                    ec = boost::asio::error::would_block;
+                } else if (ec == ppbox::data::source_error::no_more_segment) {
+                    std::vector<ppbox::avformat::SegmentInfo> segments;
+                    segment_infos(segments);
+                    media_merge_impl_.merge_impl->meger_small_head(
+                        *media_merge_impl_.ios, 
+                        *media_merge_impl_.ios, 
+                        segments, 
+                        head_size_, 
+                        ec);
+                    delete media_merge_impl_.merge_impl;
+                    media_merge_impl_.merge_impl = NULL;
+                    segment_source_->set_strategy(strategys()[++cur_pos_]);
+                    segment_source_->reset();
+                    ec.clear();
+                }
             } else {
-                if (ec == ppbox::data::source_error::no_more_segment) {
-                    if (cur_pos_ < strategys().size()) {
-                        segment_source_->set_strategy(strategys()[++cur_pos_]);
-                        segment_source_->reset();
-                        ec = boost::asio::error::would_block;
-                    } else {
-                        ec = boost::asio::error::eof;
+                segment_source_->read_some(cycle_buffers_->prepare(), ec);
+                cur_offset(cur_offset() + bytes_received);
+                if (!ec) {
+                    cycle_buffers_->commit(bytes_received);
+                } else {
+                    if (ec == ppbox::data::source_error::no_more_segment) {
+                        if (cur_pos_ < strategys().size()) {
+                            segment_source_->set_strategy(strategys()[++cur_pos_]);
+                            segment_source_->reset();
+                            ec = boost::asio::error::would_block;
+                        } else {
+                            ec = boost::asio::error::eof;
+                        }
                     }
                 }
             }
@@ -175,9 +206,14 @@ namespace ppbox
         // buffer time计算的更准确需要优化忽略MP4头部位置
         boost::uint32_t Merge::get_buffer_time(void) const
         {
-            return  cycle_buffers_->in_avail() * 
-                segment_source_->video_info().duration / 
-                segment_source_->video_info().file_size;
+            MediaInfo info;
+            error_code ec;
+            segment_source_->media()->get_info(info, ec);
+            if (!ec) {
+                 return cycle_buffers_->in_avail() * info.duration / info.file_size;
+            } else {
+                return 0;
+            }
         }
 
         void Merge::buffer_copy(
@@ -207,14 +243,28 @@ namespace ppbox
             return length;
         }
 
+        void Merge::segment_infos(
+            std::vector<ppbox::avformat::SegmentInfo> & segment_infos)
+        {
+            SegmentInfo info;
+            for (boost::uint32_t i = 0; i < source()->media()->segment_count(); ++i) {
+                source()->media()->segment_info(i, info);
+                ppbox::avformat::SegmentInfo av_info;
+                av_info.duration = info.duration;
+                av_info.file_length = info.size;
+                av_info.head_length = info.head_size;
+                segment_infos.push_back(av_info);
+            }
+        }
+
         void Merge::cancel(error_code & ec)
         {
-            source()->cancel(0, ec);
+            source()->cancel(ec);
         }
 
         void Merge::close(error_code & ec)
         {
-            source()->close(0, ec);
+            source()->close(ec);
         }
 
         boost::uint64_t const & Merge::cur_offset(void) const
@@ -242,9 +292,17 @@ namespace ppbox
             resp_(ec);
         }
 
-        void Merge::add_strategy(ppbox::data::SourceStrategy * strategy)
+        void Merge::add_strategy(ppbox::data::Strategy * strategy)
         {
             strategys_.push_back(strategy);
+        }
+
+        void Merge::add_media_merge(
+            Mp4MergeImpl * merge_impl, 
+            std::iostream * ios)
+        {
+            media_merge_impl_.merge_impl = merge_impl;
+            media_merge_impl_.ios = ios;
         }
 
     }

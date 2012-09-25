@@ -22,6 +22,7 @@ namespace ppbox
 
              void async_open(
                 framework::string::Url const & playlink, 
+                std::iostream * ios, 
                 response_type const & resp);
 
         private:

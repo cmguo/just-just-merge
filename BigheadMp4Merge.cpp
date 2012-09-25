@@ -3,9 +3,9 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/BigheadMp4Merge.h"
 #include "ppbox/data/SegmentSource.h"
-#include "ppbox/data/strategy/CdnHeadStrategy.h"
-#include "ppbox/data/strategy/BodySourceStrategy.h"
-#include "ppbox/data/strategy/CdnTailStrategy.h"
+#include "ppbox/data/strategy/BigHeadStrategy.h"
+#include "ppbox/data/strategy/BodyStrategy.h"
+#include "ppbox/data/strategy/BigTailStrategy.h"
 using namespace ppbox::data;
 
 #include <boost/bind.hpp>
@@ -28,6 +28,7 @@ namespace ppbox
 
         void BigheadMp4Merge::async_open(
             framework::string::Url const & playlink, 
+            std::iostream * ios, 
             response_type const & resp)
         {
             resp_ = resp;
@@ -42,25 +43,26 @@ namespace ppbox
         {
             std::size_t total = 0;
             if (!ec) {
-                SourceStrategy * strategy = SourceStrategy::create(
+                Strategy * strategy = Strategy::create(
                     "cdnh", 
-                    source()->segments(), 
-                    source()->video_info());
+                    *source()->media());
                 assert(strategy);
                 total += strategy->size();
                 add_strategy(strategy);
-                strategy = SourceStrategy::create(
+                strategy = Strategy::create(
                     "body", 
-                    source()->segments(), 
-                    source()->video_info());
+                    *source()->media());
                 assert(strategy);
                 total += strategy->size();
                 add_strategy(strategy);
-                if (total < source()->video_info().file_size) {
-                    strategy = SourceStrategy::create(
+                MediaInfo info;
+                error_code lec;
+                source()->media()->get_info(info, lec);
+                assert(!lec);
+                if (total < info.file_size) {
+                    strategy = Strategy::create(
                         "cdnt", 
-                        source()->segments(), 
-                        source()->video_info());
+                        *source()->media());
                     assert(strategy);
                     total += strategy->size();
                     add_strategy(strategy);
