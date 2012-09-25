@@ -34,7 +34,7 @@ namespace ppbox
 
         void MergeDispatcher::async_open_playlink(std::string const &playlink,ppbox::common::session_callback_respone const &resp)
         {
-            merge_->async_open(framework::string::Url(playlink),resp);
+            merge_->async_open(framework::string::Url(playlink),NULL,resp);
         }
 
 
