@@ -44,7 +44,7 @@ namespace ppbox
             std::size_t total = 0;
             if (!ec) {
                 Strategy * strategy = Strategy::create(
-                    "cdnh", 
+                    "bigh", 
                     *source()->media());
                 assert(strategy);
                 total += strategy->size();
@@ -61,7 +61,7 @@ namespace ppbox
                 assert(!lec);
                 if (total < info.file_size) {
                     strategy = Strategy::create(
-                        "cdnt", 
+                        "bigt", 
                         *source()->media());
                     assert(strategy);
                     total += strategy->size();
