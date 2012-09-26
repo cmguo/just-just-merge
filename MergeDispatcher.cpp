@@ -61,7 +61,7 @@ namespace ppbox
         void MergeDispatcher::async_play_playlink(ppbox::common::Session* session,ppbox::common::session_callback_respone const &resp)
         {
             player_->set(merge_,resp,session);
-            post(*player_);
+            post(boost::bind(&MergePlayer::doing,player_));
         }
 
         void MergeDispatcher::cancel_play_playlink(boost::system::error_code& ec)
@@ -72,7 +72,7 @@ namespace ppbox
         void MergeDispatcher::async_buffering(ppbox::common::Session* session,ppbox::common::session_callback_respone const &resp)
         {
             player_->set(merge_,resp);
-            post(*player_);
+            post(boost::bind(&MergePlayer::doing,player_));
         }
 
         void MergeDispatcher::cancel_buffering(boost::system::error_code& ec)

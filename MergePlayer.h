@@ -18,7 +18,7 @@ namespace ppbox
             virtual ~MergePlayer();
 
 
-            void operator ()();
+            void doing();
 
 
             void set(
