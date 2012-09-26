@@ -12,7 +12,8 @@ namespace ppbox
 
             enum errors
             {
-                write_mp4_head_error = 1, 
+                write_mp4_head_error = 1,
+                buffering_error,
             };
 
             namespace detail {
@@ -32,9 +33,15 @@ namespace ppbox
 
                     std::string message(int value) const
                     {
-                        if (value == error::write_mp4_head_error)
+                        switch(value)
+                        {
+                        case error::write_mp4_head_error:
                             return "merge: write mp4 head error";
-                        return "data source: unknown error";
+                        case error::buffering_error:
+                            return "merge: buffering error";
+                        default:
+                            return "data source: unknown error";
+                        }
                     }
                 };
 

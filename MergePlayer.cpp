@@ -3,6 +3,7 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/MergePlayer.h"
 #include "ppbox/merge/Merge.h"
+#include "ppbox/merge/MergeError.h"
 
 #include <framework/logger/StreamRecord.h>
 using namespace framework::logger;
@@ -15,8 +16,9 @@ namespace ppbox
 {
     namespace merge
     {
-        MergePlayer::MergePlayer()
-            : merge_(NULL)
+        MergePlayer::MergePlayer(boost::asio::io_service & ios)
+            : PlayInterface(ios)
+            , merge_(NULL)
             , session_(NULL)
         {
         }
@@ -39,7 +41,7 @@ namespace ppbox
 
             exit_ = true;
 
-            resp_(ec);
+            ios_.post(boost::bind(resp_,ec));
         }
 
         void MergePlayer::set(
@@ -56,18 +58,17 @@ namespace ppbox
         {
             boost::system::error_code ec;
 
-            while(exit_)
+            while(!exit_)
             {
                 ec.clear();
 
-                for (boost::int32_t ii = 0; ii < 10; ++ii)
+                //for (boost::int32_t ii = 0; ii < 10; ++ii)
+                //{
+                boost::uint32_t iTime = merge_->get_buffer_time();
+                if (iTime == boost::uint32_t(-1))
                 {
-                    merge_->get_buffer_time();
-                    if (ec/* == boost::asio::error::would_block*/)
-                    {
-                        break;
-                    }
-                    //demuxer_->get_buffer_time(ec,ec1);
+                    ec = error::buffering_error;
+                    break;
                 }
                 boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }

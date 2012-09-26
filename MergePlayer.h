@@ -14,7 +14,7 @@ namespace ppbox
         {
         public:
 
-            MergePlayer();
+            MergePlayer(boost::asio::io_service & ios);
             virtual ~MergePlayer();
 
 

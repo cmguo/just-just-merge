@@ -17,7 +17,7 @@ namespace ppbox
         MergeDispatcher::MergeDispatcher(
             boost::asio::io_service & ios)
             : ppbox::common::Dispatcher(ios)
-            , player_(new MergePlayer())
+            , player_(new MergePlayer(ios))
             , merge_(new BigheadMp4Merge(ios,4*1024*1024))
         {
         }
