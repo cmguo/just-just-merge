@@ -130,6 +130,7 @@ namespace ppbox
             std::vector<boost::uint8_t> tmp_buffer_;
             boost::uint32_t read_size_;
             boost::uint32_t head_size_;
+            // 已经下载数据的偏移量
             boost::uint64_t cur_offset_;
 
             ppbox::data::SegmentSource * segment_source_;

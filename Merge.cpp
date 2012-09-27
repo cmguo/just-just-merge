@@ -30,7 +30,7 @@ namespace ppbox
             , head_size_(0)
             , cur_offset_(0)
             , segment_source_(new SegmentSource(io_srv_))
-            , cur_pos_(0)
+            , cur_pos_(boost::uint32_t(-1))
         {
             buffer_ = (char*)private_memory_.alloc_block(buffer_size_);
             mutable_buffers_1 buffers(buffer_, buffer_size_);
@@ -148,9 +148,9 @@ namespace ppbox
                     ec.clear();
                 }
             } else {
-                segment_source_->read_some(cycle_buffers_->prepare(), ec);
-                cur_offset(cur_offset() + bytes_received);
+                bytes_received = segment_source_->read_some(cycle_buffers_->prepare(), ec);
                 if (!ec) {
+                    cur_offset(cur_offset() + bytes_received);
                     cycle_buffers_->commit(bytes_received);
                 } else {
                     if (ec == ppbox::data::source_error::no_more_segment) {
