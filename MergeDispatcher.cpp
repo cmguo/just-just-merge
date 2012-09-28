@@ -4,6 +4,9 @@
 #include "ppbox/merge/MergeDispatcher.h"
 #include "ppbox/merge/BigheadMp4Merge.h"
 
+#include <ppbox/data/MediaBase.h>
+#include <ppbox/data/SegmentSource.h>
+
 #include <framework/logger/Logger.h>
 #include <framework/logger/StreamRecord.h>
 using namespace framework::logger;
@@ -96,14 +99,23 @@ namespace ppbox
             ppbox::common::MediaInfo & info)
         {
             LOG_INFO("[get_media_info]");
-            return boost::system::error_code();
+            boost::system::error_code ec;
+            ppbox::data::MediaInfo infoBase;
+            merge_->source()->media()->get_info(infoBase,ec);
+            if(!ec)
+            {
+                info.duration = infoBase.duration;
+                info.filesize = infoBase.file_size;
+            }
+            return ec;
         }
 
         boost::system::error_code MergeDispatcher::get_play_info(
             ppbox::common::PlayInfo & info)
         {
             LOG_INFO("[get_play_info]");
-            return boost::system::error_code();
+            boost::system::error_code ec;
+            return ec;
         }
 
     } // namespace mux
