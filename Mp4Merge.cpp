@@ -28,36 +28,19 @@ namespace ppbox
         {
         }
 
-        void Mp4Merge::async_open(
-            framework::string::Url const & playlink, 
-            std::iostream * ios, 
-            response_type const & resp)
+        void Mp4Merge::set_strategys(void)
         {
-            resp_ = resp;
-            ios_ = ios;
-            source()->async_open(
-                playlink, 
-                0, 
-                boost::uint64_t(-1), 
-                boost::bind(&Mp4Merge::open_callback, this, _1));
-        }
-
-        void Mp4Merge::open_callback(error_code const & ec)
-        {
-            if (!ec) {
-                Strategy * strategy = Strategy::create(
-                    "head", 
-                    *source()->media());
-                assert(strategy);
-                add_strategy(strategy);
-                strategy = Strategy::create(
-                    "body", 
-                    *source()->media());
-                add_strategy(strategy);
-                Mp4MergeImpl * mp4_merge_impl = new Mp4MergeImpl;
-                add_media_merge(mp4_merge_impl, ios_);
-            }
-            resp_(ec);
+            Strategy * strategy = Strategy::create(
+                "head", 
+                *source()->media());
+            assert(strategy);
+            add_strategy(strategy);
+            strategy = Strategy::create(
+                "body", 
+                *source()->media());
+            add_strategy(strategy);
+            //Mp4MergeImpl * mp4_merge_impl = new Mp4MergeImpl;
+            //add_media_merge(mp4_merge_impl, ios_);
         }
 
     } // namespace merge

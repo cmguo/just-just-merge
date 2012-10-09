@@ -26,49 +26,33 @@ namespace ppbox
         {
         }
 
-        void BigheadMp4Merge::async_open(
-            framework::string::Url const & playlink, 
-            std::iostream * ios, 
-            response_type const & resp)
+        void BigheadMp4Merge::set_strategys(void)
         {
-            resp_ = resp;
-            source()->async_open(
-                playlink, 
-                0, 
-                boost::uint64_t(-1), 
-                boost::bind(&BigheadMp4Merge::open_callback, this, _1));
-        }
-
-        void BigheadMp4Merge::open_callback(error_code const & ec)
-        {
-            std::size_t total = 0;
-            if (!ec) {
-                Strategy * strategy = Strategy::create(
-                    "bigh", 
-                    *source()->media());
-                assert(strategy);
-                total += strategy->size();
-                add_strategy(strategy);
+            boost::uint64_t total = 0;
+            Strategy * strategy = Strategy::create(
+                "bigh", 
+                *source()->media());
+            assert(strategy);
+            total += strategy->size();
+            add_strategy(strategy);
+            strategy = Strategy::create(
+                "body", 
+                *source()->media());
+            assert(strategy);
+            total += strategy->size();
+            add_strategy(strategy);
+            MediaInfo info;
+            error_code lec;
+            source()->media()->get_info(info, lec);
+            assert(!lec);
+            if (total < info.file_size) {
                 strategy = Strategy::create(
-                    "body", 
+                    "bigt", 
                     *source()->media());
                 assert(strategy);
                 total += strategy->size();
                 add_strategy(strategy);
-                MediaInfo info;
-                error_code lec;
-                source()->media()->get_info(info, lec);
-                assert(!lec);
-                if (total < info.file_size) {
-                    strategy = Strategy::create(
-                        "bigt", 
-                        *source()->media());
-                    assert(strategy);
-                    total += strategy->size();
-                    add_strategy(strategy);
-                }
             }
-            resp_(ec);
         }
     } // namespace merge
 } // namespace ppbox

@@ -17,6 +17,8 @@ namespace ppbox
 {
     namespace data
     {
+        class MediaBase;
+        class SourceBase;
         class Strategy;
         class SegmentSource;
     }
@@ -54,7 +56,7 @@ namespace ppbox
 
             ~Merge();
 
-            virtual void async_open(
+            void async_open(
                 framework::string::Url const & playlink, 
                 std::iostream * ios, 
                 response_type const & resp);
@@ -63,28 +65,30 @@ namespace ppbox
                 std::vector<boost::asio::const_buffer> & buffers,
                 boost::system::error_code & ec);
 
-            virtual boost::system::error_code seek(
+            boost::system::error_code seek(
                 std::size_t offset, 
                 boost::system::error_code & ec);
 
-            virtual boost::uint32_t get_buffer_time(void) const;
+            boost::uint32_t get_buffer_time(void) const;
 
-            virtual std::size_t valid() const;
+            std::size_t valid() const;
 
-            virtual std::size_t size() const;
+            std::size_t size() const;
 
-            virtual void cancel(boost::system::error_code & ec);
+            void cancel(boost::system::error_code & ec);
 
-            virtual void close(boost::system::error_code & ec);
+            void close(boost::system::error_code & ec);
 
             ppbox::data::SegmentSource * source(void);
 
+            ppbox::data::MediaBase * media(void);
+
         protected:
+            void set_strategys(void);
+
             boost::uint64_t const & cur_offset(void) const;
 
             void cur_offset(boost::uint64_t const & offset);
-
-            void response(response_type const & resp);
 
             void response(boost::system::error_code const & ec);
 
@@ -117,6 +121,11 @@ namespace ppbox
         protected:
             // 协议级合并器
             MediaMergeImpl media_merge_impl_;
+            framework::string::Url playlink_;
+            // opened by merge
+            ppbox::data::MediaBase * media_;
+            // opened by SegmentSource
+            ppbox::data::SourceBase * source_;
 
         private:
             boost::asio::io_service & io_srv_;

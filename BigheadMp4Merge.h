@@ -20,16 +20,8 @@ namespace ppbox
 
             ~BigheadMp4Merge();
 
-             void async_open(
-                framework::string::Url const & playlink, 
-                std::iostream * ios, 
-                response_type const & resp);
-
         private:
-            void open_callback(boost::system::error_code const & ec);
-
-        private:
-            response_type resp_;
+            virtual void set_strategys(void);
 
         };
     }

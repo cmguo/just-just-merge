@@ -76,7 +76,7 @@ namespace ppbox
             }
         }
 
-        boost::system::error_code MergeStatistic::get_info_statictis(MergeInfo & info) const
+        boost::system::error_code MergeStatistic::get_info_statictis(MergeStatInfo & info) const
         {
             info = info_;
             return boost::system::error_code();

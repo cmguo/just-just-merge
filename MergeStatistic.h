@@ -9,9 +9,9 @@ namespace ppbox
 {
     namespace merge
     {
-        struct MergeInfo
+        struct MergeStatInfo
         {
-            MergeInfo()
+            MergeStatInfo()
                 : head_size(0)
                 , tail_size(0)
                 , body_size(0)
@@ -48,7 +48,7 @@ namespace ppbox
                 boost::uint32_t bytes,
                 boost::uint64_t offset);
 
-            boost::system::error_code get_info_statictis(MergeInfo & info) const;
+            boost::system::error_code get_info_statictis(MergeStatInfo & info) const;
 
             boost::uint64_t const & offset(void) const;
 
@@ -56,7 +56,7 @@ namespace ppbox
 
         private:
             std::string name_;
-            MergeInfo info_;
+            MergeStatInfo info_;
             framework::timer::TickCounter tick_counter_;
             boost::uint32_t increase_bytes_;
         };

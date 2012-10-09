@@ -32,6 +32,8 @@ namespace ppbox
             , segment_source_(new SegmentSource(io_srv_))
             , cur_pos_(boost::uint32_t(-1))
         {
+            media_ = NULL;
+            source_ = NULL;
             buffer_ = (char*)private_memory_.alloc_block(buffer_size_);
             mutable_buffers_1 buffers(buffer_, buffer_size_);
             cycle_buffers_ = new util::buffers::CycleBuffers< 
@@ -49,6 +51,11 @@ namespace ppbox
                 delete segment_source_;
                 segment_source_ = NULL;
             }
+            source_ = NULL;
+            if (media_) {
+                delete media_;
+                media_ = NULL;
+            }
             for (boost::uint32_t i = 0; i < strategys_.size(); i++) {
                 Strategy::destory(strategys_[i]);
             }
@@ -59,27 +66,39 @@ namespace ppbox
             std::iostream * ios, 
             response_type const & resp)
         {
-            response(resp);
-            segment_source_->async_open(
-                playlink, 
-                0, 
-                boost::uint64_t(-1), 
-                boost::bind(&Merge::open_callback, this, _1));
+            playlink_ = playlink;
+            resp_ = resp;
+            media_ = MediaBase::create(io_srv_, playlink);
+            assert(media_);
+            media_->async_open(boost::bind(&Merge::open_callback, this, _1));
         }
 
         void Merge::open_callback(boost::system::error_code const & ec)
         {
+            boost::system::error_code lec = ec;
             if (ec) {
-                LOG_WARN("[open_callback] ec: " << ec.message());
+                LOG_WARN("[open_callback] media open, ec: " << ec.message());
             } else {
-                Strategy * strategy = Strategy::create(
-                    "full", 
-                    *segment_source_->media());
-                add_strategy(strategy);
-                segment_source_->set_strategy(strategys()[cur_pos_]);
+                source_ = SourceBase::create(io_srv_, playlink_.protocol());
+                assert(source_);
+                segment_source_->media(media_);
+                segment_source_->source(source_);
+                segment_source_->set_max_try(3);
+                if (!source_->set_non_block(true, lec)) {
+                    set_strategys();
+                }
+                segment_source_->strategy(strategys()[cur_pos_]);
                 segment_source_->reset();
             }
-            response(ec);
+            response(lec);
+        }
+
+        void Merge::set_strategys(void)
+        {
+            Strategy * strategy = Strategy::create(
+                "full", 
+                *segment_source_->media());
+            add_strategy(strategy);
         }
 
         std::size_t Merge::read(
@@ -143,7 +162,7 @@ namespace ppbox
                         ec);
                     delete media_merge_impl_.merge_impl;
                     media_merge_impl_.merge_impl = NULL;
-                    segment_source_->set_strategy(strategys()[++cur_pos_]);
+                    segment_source_->strategy(strategys()[++cur_pos_]);
                     segment_source_->reset();
                     ec.clear();
                 }
@@ -155,7 +174,9 @@ namespace ppbox
                 } else {
                     if (ec == ppbox::data::source_error::no_more_segment) {
                         if (cur_pos_ < strategys().size()) {
-                            segment_source_->set_strategy(strategys()[++cur_pos_]);
+                            //boost::system::error_code lec;
+                            //segment_source_->close(lec);
+                            segment_source_->strategy(strategys()[++cur_pos_]);
                             segment_source_->reset();
                             ec = boost::asio::error::would_block;
                         } else {
@@ -193,7 +214,7 @@ namespace ppbox
                         if (offset < strategys()[i]->size()) {
                             if (i != cur_pos_) {
                                 cur_pos_ = i;
-                                segment_source_->set_strategy(strategys()[cur_pos_]);
+                                segment_source_->strategy(strategys()[cur_pos_]);
                             }
                             segment_source_->seek(offset, ec);
                             break;
@@ -291,9 +312,9 @@ namespace ppbox
             return segment_source_;
         }
 
-        void Merge::response(response_type const & resp)
+        MediaBase * Merge::media(void)
         {
-            resp_ = resp;
+            return media_;
         }
 
         void Merge::response(error_code const & ec)
