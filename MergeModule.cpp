@@ -43,7 +43,6 @@ namespace ppbox
             merge_info.playlink = url;
             merge_info.id = id++;
             close_token = merge_info.id;
-            merge_info.state = StateType::opening;
             merge_info.resp = resp;
             boost::uint32_t buffer_size = 10*1024*1024;
             if (type == MergeType::bighead) {
@@ -55,6 +54,7 @@ namespace ppbox
             } else {
                 assert(0);
             }
+            merge_info.state = StateType::opening;
             merge_info.merge->async_open(
                 merge_info.playlink, 
                 NULL, 

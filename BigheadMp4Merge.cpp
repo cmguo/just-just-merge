@@ -29,30 +29,21 @@ namespace ppbox
         void BigheadMp4Merge::set_strategys(void)
         {
             boost::uint64_t total = 0;
-            Strategy * strategy = Strategy::create(
-                "bigh", 
-                *source()->media());
-            assert(strategy);
-            total += strategy->size();
+            SegmentStrategy * strategy = new ppbox::data::BigHeadStrategy(*media_);
+            total += strategy->byte_size();
             add_strategy(strategy);
-            strategy = Strategy::create(
-                "body", 
-                *source()->media());
-            assert(strategy);
-            total += strategy->size();
+            strategy = new ppbox::data::BodyStrategy(*media_);
+            total += strategy->byte_size();
             add_strategy(strategy);
             MediaInfo info;
             error_code lec;
-            source()->media()->get_info(info, lec);
+            media_->get_info(info, lec);
             assert(!lec);
-            if (total < info.file_size) {
-                strategy = Strategy::create(
-                    "bigt", 
-                    *source()->media());
-                assert(strategy);
-                total += strategy->size();
-                add_strategy(strategy);
-            }
+            //if (total < info.file_size) {
+            strategy = new ppbox::data::BigTailStrategy(*media_);
+            total += strategy->byte_size();
+            add_strategy(strategy);
+            //}
         }
     } // namespace merge
 } // namespace ppbox

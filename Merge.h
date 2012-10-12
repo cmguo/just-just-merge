@@ -19,7 +19,7 @@ namespace ppbox
     {
         class MediaBase;
         class SourceBase;
-        class Strategy;
+        class SegmentStrategy;
         class SegmentSource;
     }
 
@@ -73,18 +73,21 @@ namespace ppbox
 
             std::size_t valid() const;
 
-            std::size_t size() const;
+            std::size_t size();
 
             void cancel(boost::system::error_code & ec);
 
             void close(boost::system::error_code & ec);
 
-            ppbox::data::SegmentSource * source(void);
+            ppbox::data::SegmentSource & source(void);
 
-            ppbox::data::MediaBase * media(void);
+            ppbox::data::MediaBase & media(void);
 
         protected:
-            void set_strategys(void);
+            void add_strategy(ppbox::data::SegmentStrategy * strategy);
+
+        private:
+            virtual void set_strategys(void);
 
             boost::uint64_t const & cur_offset(void) const;
 
@@ -92,16 +95,10 @@ namespace ppbox
 
             void response(boost::system::error_code const & ec);
 
-            void add_strategy(ppbox::data::Strategy * strategy);
-
             void add_media_merge(
                 Mp4MergeImpl * merge_impl, 
                 std::iostream * ios);
 
-            std::vector<ppbox::data::Strategy *> const & 
-                strategys(void) const;
-
-        private:
             void open_callback(boost::system::error_code const & ec);
 
             boost::system::error_code prepare(
@@ -118,14 +115,11 @@ namespace ppbox
             void segment_infos(
                 std::vector<ppbox::avformat::SegmentInfo> & segment_infos);
 
+            void change_source(ppbox::data::SegmentStrategy * strategy);
+
         protected:
-            // 协议级合并器
-            MediaMergeImpl media_merge_impl_;
-            framework::string::Url playlink_;
             // opened by merge
             ppbox::data::MediaBase * media_;
-            // opened by SegmentSource
-            ppbox::data::SourceBase * source_;
 
         private:
             boost::asio::io_service & io_srv_;
@@ -142,8 +136,13 @@ namespace ppbox
             // 已经下载数据的偏移量
             boost::uint64_t cur_offset_;
 
+            // 协议级合并器
+            MediaMergeImpl media_merge_impl_;
+            framework::string::Url playlink_;
+            // opened by SegmentSource
+            ppbox::data::SourceBase * source_;
             ppbox::data::SegmentSource * segment_source_;
-            std::vector<ppbox::data::Strategy *> strategys_;
+            std::vector<ppbox::data::SegmentStrategy *> strategys_;
             boost::uint32_t cur_pos_;
 
             response_type resp_;
