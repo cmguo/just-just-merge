@@ -30,14 +30,9 @@ namespace ppbox
 
         void Mp4Merge::set_strategys(void)
         {
-            Strategy * strategy = Strategy::create(
-                "head", 
-                *source()->media());
-            assert(strategy);
+            SegmentStrategy * strategy = new ppbox::data::HeadStrategy(*media_);
             add_strategy(strategy);
-            strategy = Strategy::create(
-                "body", 
-                *source()->media());
+            strategy = new ppbox::data::BodyStrategy(*media_);
             add_strategy(strategy);
             //Mp4MergeImpl * mp4_merge_impl = new Mp4MergeImpl;
             //add_media_merge(mp4_merge_impl, ios_);
