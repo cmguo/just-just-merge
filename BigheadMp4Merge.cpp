@@ -32,9 +32,10 @@ namespace ppbox
             SegmentStrategy * strategy = new ppbox::data::BigHeadStrategy(*media_);
             total += strategy->byte_size();
             add_strategy(strategy);
-            strategy = new ppbox::data::BodyStrategy(*media_);
-            total += strategy->byte_size();
-            add_strategy(strategy);
+            BodyStrategy * bodystrategy = new ppbox::data::BodyStrategy(*media_);
+            bodystrategy->drop_redundancy();
+            total += bodystrategy->byte_size();
+            add_strategy(bodystrategy);
             MediaInfo info;
             error_code lec;
             media_->get_info(info, lec);
