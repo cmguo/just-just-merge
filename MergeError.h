@@ -12,8 +12,8 @@ namespace ppbox
 
             enum errors
             {
-                write_mp4_head_error = 1,
-                buffering_error,
+                already_open = 1,   // 已经打开
+                not_open,           // 未打开
             };
 
             namespace detail {
@@ -35,12 +35,12 @@ namespace ppbox
                     {
                         switch(value)
                         {
-                        case error::write_mp4_head_error:
-                            return "merge: write mp4 head error";
-                        case error::buffering_error:
-                            return "merge: buffering error";
+                        case error::already_open:
+                            return "merge: already open";
+                        case error::not_open:
+                            return "merge: not open";
                         default:
-                            return "data source: unknown error";
+                            return "merge: unknown error";
                         }
                     }
                 };

@@ -1,86 +1,49 @@
 // MergeModule.h
-#ifndef   _PPBOX_MERGE_MERGE_MODULE_
-#define   _PPBOX_MERGE_MERGE_MODULE_
+
+#ifndef _PPBOX_MERGE_MERGE_MODULE_H_
+#define _PPBOX_MERGE_MERGE_MODULE_H_
 
 #include <framework/string/Url.h>
+
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
+#include <boost/function.hpp>
 
 namespace ppbox
 {
     namespace merge
     {
-        class Merge;
-        class MergeModule;
 
-        struct MergeType
-        {
-            enum Enum
-            {
-                bighead,
-                smallhead,
-                full,
-            };
-        };
-
-        struct StateType
-        {
-            enum Enum
-            {
-                opening,
-                canceled,
-                opened,
-                closed,
-            };
-        };
-
-        typedef boost::function<void (
-            boost::system::error_code const &, 
-            Merge *)
-        > open_response_type;
-
-        struct MergeInfo
-        {
-            std::size_t id;
-            framework::string::Url playlink;
-            Merge * merge;
-            StateType::Enum state;
-            open_response_type resp;
-
-            struct MergeFinder
-            {
-                MergeFinder(std::size_t id)
-                    : id_(id)
-                {
-                }
-
-                bool operator()(MergeInfo const & info)
-                {
-                    if (info.id == id_) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-
-                std::size_t id_;
-            };
-        };
+        class MergerBase;
 
         class MergeModule
             : public ppbox::common::CommonModuleBase<MergeModule>
         {
+        public:
+            typedef boost::function<void (
+                boost::system::error_code const &, 
+                MergerBase *)
+            > open_response_type;
+
+        public:
+            MergeModule(
+                util::daemon::Daemon & daemon);
+
+            ~MergeModule();
+
         public:
             virtual boost::system::error_code startup();
 
             virtual void shutdown();
 
         public:
-            MergeModule(util::daemon::Daemon & daemon);
-
-            ~MergeModule();
+            MergerBase * open(
+                framework::string::Url const & play_link, 
+                size_t & close_token, 
+                boost::system::error_code & ec);
 
             void async_open(
                 framework::string::Url const & url, 
-                MergeType::Enum const & type, 
                 size_t & close_token, 
                 open_response_type const & resp);
 
@@ -88,18 +51,49 @@ namespace ppbox
                 std::size_t close_token, 
                 boost::system::error_code & ec);
 
-            Merge * find(framework::string::Url const & url);
+            MergerBase * find(
+                framework::string::Url const & url);
 
         private:
-            void open_callback(
-                boost::system::error_code const & ec, 
-                std::size_t const & close_token);
+            struct MergeInfo;
 
         private:
+            MergeInfo * create(
+                framework::string::Url const & play_link, 
+                open_response_type const & resp, 
+                boost::system::error_code & ec);
+
+            void async_open(
+                boost::mutex::scoped_lock & lock, 
+                MergeInfo * info);
+
+            void handle_open(
+                boost::system::error_code const & ec,
+                MergeInfo * info);
+
+            boost::system::error_code close_locked(
+                MergeInfo * info, 
+                bool inner_call, 
+                boost::system::error_code & ec);
+
+            boost::system::error_code close(
+                MergeInfo * info, 
+                boost::system::error_code & ec);
+
+            boost::system::error_code cancel(
+                MergeInfo * info, 
+                boost::system::error_code & ec);
+
+            void destory(
+                MergeInfo * info);
+
+        private:
+            std::vector<MergeInfo *> mergers_;
             boost::mutex mutex_;
-            std::vector<MergeInfo> merge_infos_;
+            boost::condition_variable cond_;
         };
-    }
-}
 
-#endif
+    } // namespace merge
+} // namespace ppbox
+
+#endif // _PPBOX_MERGE_MERGE_MODULE_H_
