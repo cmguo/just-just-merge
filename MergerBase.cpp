@@ -60,7 +60,7 @@ namespace ppbox
             response_type const & resp)
         {
             resp_ = resp;
-            media_.async_open(boost::bind(&MergerBase::open_callback, this, _1));
+            media_.async_open(boost::bind(&MergerBase::handle_async, this, _1));
         }
 
         void MergerBase::cancel(
@@ -76,15 +76,21 @@ namespace ppbox
             source_->close(ec);
         }
 
-        void MergerBase::open_callback(
+        void MergerBase::handle_async(
             boost::system::error_code const & ec)
         {
             boost::system::error_code lec = ec;
             if (ec) {
-                LOG_WARN("[open_callback] media open, ec: " << ec.message());
+                LOG_WARN("[handle_async] media open, ec: " << ec.message());
             } else {
+                media_.get_info(media_info_, lec);
+                if (media_info_.bitrate == 0) {
+                    if (media_info_.duration != 0) {
+                        media_info_.bitrate = media_info_.file_size / media_info_.duration;
+                    }
+                }
                 set_strategys();
-                seek(0, lec);
+                byte_seek(0, lec);
                 if (lec == boost::asio::error::would_block)
                     lec.clear();
             }
@@ -99,7 +105,7 @@ namespace ppbox
             resp(ec);
         }
 
-        bool MergerBase::seek(
+        bool MergerBase::byte_seek(
             boost::uint64_t offset, 
             boost::system::error_code & ec)
         {
@@ -123,14 +129,20 @@ namespace ppbox
             }
         }
 
+        bool MergerBase::reset(
+            boost::system::error_code & ec)
+        {
+            return byte_seek(0, ec);
+        }
+
         bool MergerBase::read(
-            ppbox::avformat::Sample & sample,
+            Sample & sample,
             boost::system::error_code & ec)
         {
             buffer_->drop_to(read_.time_range.pos, ec);
-            buffer_->prepare_some(0, ec);
+            buffer_->prepare_some(ec);
 
-            if (seek_pending_ && !seek(read_.time_range.big_pos(), ec)) {
+            if (seek_pending_ && !byte_seek(read_.time_range.big_pos(), ec)) {
                 //if (ec == boost::asio::error::would_block) {
                 //    block_on();
                 //}
@@ -141,6 +153,7 @@ namespace ppbox
 
             while (!ec) {
                 if (read_.time_range.end > read_.time_range.pos) {
+                    sample.time = read_.time_range.big_pos() / media_info_.bitrate;
                     sample.size = read_size_;
                     if (sample.size > read_.time_range.end - read_.time_range.pos)
                         sample.size = (size_t)(read_.time_range.end - read_.time_range.pos);
@@ -156,21 +169,26 @@ namespace ppbox
                     }
                 } else {
                     buffer_->drop_all(read_.time_range.end, ec);
-                    seek(read_.time_range.big_end(), ec);
+                    byte_seek(read_.time_range.big_end(), ec);
                 }
             }
 
             return !ec;
         }
 
-        boost::uint64_t MergerBase::total_size()
+        void MergerBase::media_info(
+            MediaInfo & info)
         {
-            return strategy_->time_size();
+            boost::system::error_code ec;
+            media_.get_info(info, ec);
         }
 
-        boost::uint64_t MergerBase::get_current()
+        void MergerBase::play_info(
+            PlayInfo & info)
         {
-            return read_.time_range.pos;
+            info.byte_range.beg = 0;
+            info.byte_range.pos = read_.time_range.big_pos();
+            info.byte_range.end = strategy_->time_size();
         }
 
         boost::uint64_t MergerBase::get_buffer_size()
@@ -179,15 +197,11 @@ namespace ppbox
         }
 
         boost::uint64_t MergerBase::get_buffer_time(
-            boost::system::error_code & ec)
+            boost::system::error_code & ec, 
+            boost::system::error_code & ec_buf)
         {
-            MediaInfo info;
-            media_.get_info(info, ec);
-            if (!ec) {
-                return buffer_->in_avail() * info.duration / info.file_size;
-            } else {
-                return 0;
-            }
+            buffer_->prepare_some(ec_buf);
+            return buffer_->in_avail() * media_info_.bitrate;
         }
 
         void MergerBase::add_strategy(

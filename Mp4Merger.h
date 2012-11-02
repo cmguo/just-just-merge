@@ -23,7 +23,7 @@ namespace ppbox
             virtual ~Mp4Merger();
 
         public:
-            virtual bool seek(
+            virtual bool byte_seek(
                 boost::uint64_t offset, 
                 boost::system::error_code & ec);
 

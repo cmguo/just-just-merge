@@ -14,6 +14,8 @@ namespace ppbox
             {
                 already_open = 1,   // 已经打开
                 not_open,           // 未打开
+                format_not_match, 
+                end_of_file, 
             };
 
             namespace detail {
@@ -39,6 +41,10 @@ namespace ppbox
                             return "merge: already open";
                         case error::not_open:
                             return "merge: not open";
+                        case error::format_not_match:
+                            return "merge: format not match";
+                        case error::end_of_file:
+                            return "merge: end of file";
                         default:
                             return "merge: unknown error";
                         }

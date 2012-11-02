@@ -3,10 +3,12 @@
 #ifndef _PPBOX_MERGE_MERGER_BASE_H_
 #define _PPBOX_MERGE_MERGER_BASE_H_
 
+#include "ppbox/merge/MergeBase.h"
 #include "ppbox/merge/MergeStatistic.h"
 
 #include <ppbox/data/SegmentPosition.h>
-#include <ppbox/avformat/Format.h>
+
+#include <framework/configure/Config.h>
 
 #include <boost/asio/buffer.hpp>
 
@@ -49,32 +51,43 @@ namespace ppbox
             virtual void close(
                 boost::system::error_code & ec);
 
-            virtual bool seek(
+            virtual bool byte_seek(
                 boost::uint64_t offset, 
                 boost::system::error_code & ec);
 
-            virtual boost::uint64_t total_size();
-
-            bool read(
-                ppbox::avformat::Sample & sample,
+            virtual bool reset(
                 boost::system::error_code & ec);
 
-            boost::uint64_t get_current();
+            bool read(
+                Sample & sample,
+                boost::system::error_code & ec);
+
+            virtual void media_info(
+                MediaInfo & info);
+
+            virtual void play_info(
+                PlayInfo & info);
 
             boost::uint64_t get_buffer_size();
 
             boost::uint64_t get_buffer_time(
-                boost::system::error_code & ec);
+                boost::system::error_code & ec, 
+                boost::system::error_code & ec_buf);
 
             boost::uint64_t valid() const;
 
         public:
-            ppbox::data::MediaBase const & media(void)
+            framework::configure::Config & config()
+            {
+                return config_;
+            }
+
+            ppbox::data::MediaBase const & media()
             {
                 return media_;
             }
 
-            ppbox::data::SegmentSource const & source(void)
+            ppbox::data::SegmentSource const & source()
             {
                 return *source_;
             }
@@ -93,11 +106,13 @@ namespace ppbox
             void response(
                 boost::system::error_code const & ec);
 
-            void open_callback(
+            void handle_async(
                 boost::system::error_code const & ec);
 
         protected:
+            framework::configure::Config config_;
             ppbox::data::MediaBase & media_;
+            ppbox::data::MediaInfo media_info_;
             ppbox::data::SegmentBuffer * buffer_;
 
         private:

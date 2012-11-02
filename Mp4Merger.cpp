@@ -22,13 +22,15 @@ namespace ppbox
             , big_head_(false)
             , head_strategy_(NULL)
         {
+            config_.register_module("Mp4Merger")
+                << CONFIG_PARAM_NAME_RDWR("big_head", big_head_);
         }
 
         Mp4Merger::~Mp4Merger()
         {
         }
 
-        bool Mp4Merger::seek(
+        bool Mp4Merger::byte_seek(
             boost::uint64_t offset, 
             boost::system::error_code & ec)
         {
@@ -37,7 +39,7 @@ namespace ppbox
                 && ec != boost::asio::error::would_block) {
                     return false;
             }
-            return MergerBase::seek(offset, ec);
+            return MergerBase::byte_seek(offset, ec);
         }
 
         void Mp4Merger::set_strategys(void)
