@@ -27,8 +27,8 @@ namespace ppbox
             boost::asio::io_service & io_svc, 
             ppbox::data::MediaBase & media)
             : media_(media)
-            , source_(NULL)
             , buffer_(NULL)
+            , source_(NULL)
             , strategy_(NULL)
             , seek_pending_(false)
             , read_size_(4 * 1024)
