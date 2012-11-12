@@ -50,7 +50,7 @@ namespace ppbox
             }
             if (source_) {
                 ppbox::data::SourceBase * source = (ppbox::data::SourceBase *)&source_->source();
-                ppbox::data::SourceBase::destory(source);
+                ppbox::data::SourceBase::destroy(source);
                 delete source_;
                 source_ = NULL;
             }
