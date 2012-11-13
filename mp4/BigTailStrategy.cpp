@@ -11,7 +11,7 @@ namespace ppbox
     {
 
         BigTailStrategy::BigTailStrategy(
-            ppbox::data::MediaBase & media)
+            ppbox::data::SegmentMedia & media)
             : SegmentStrategy(media)
         {
         }

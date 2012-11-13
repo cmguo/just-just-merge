@@ -17,7 +17,7 @@ namespace ppbox
 
         Mp4Merger::Mp4Merger(
             boost::asio::io_service & io_svc, 
-            ppbox::data::MediaBase & media)
+            ppbox::data::SegmentMedia & media)
             : MergerBase(io_svc, media)
             , big_head_(false)
             , head_strategy_(NULL)

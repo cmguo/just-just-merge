@@ -15,7 +15,7 @@ namespace ppbox
         {
         public:
             BigHeadStrategy(
-                ppbox::data::MediaBase & media);
+                ppbox::data::SegmentMedia & media);
 
             virtual ~BigHeadStrategy();
 

@@ -18,7 +18,7 @@ namespace ppbox
         public:
             Mp4Merger(
                 boost::asio::io_service & io_svc, 
-                ppbox::data::MediaBase & media);
+                ppbox::data::SegmentMedia & media);
 
             virtual ~Mp4Merger();
 

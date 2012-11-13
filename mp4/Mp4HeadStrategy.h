@@ -1,7 +1,7 @@
 // Mp4HeadStrategy.h
 
-#ifndef _PPBOX_MERGE_P4_HAED_STRATEGY_H_
-#define _PPBOX_MERGE_P4_HAED_STRATEGY_H_
+#ifndef _PPBOX_MERGE_MP4_HAED_STRATEGY_H_
+#define _PPBOX_MERGE_MP4_HAED_STRATEGY_H_
 
 #include <ppbox/data/strategy/HeadStrategy.h>
 
@@ -20,7 +20,7 @@ namespace ppbox
         {
         public:
             Mp4HeadStrategy(
-                ppbox::data::MediaBase & media, 
+                ppbox::data::SegmentMedia & media, 
                 ppbox::data::SegmentBuffer & buffer);
 
             virtual ~Mp4HeadStrategy();
@@ -49,4 +49,4 @@ namespace ppbox
     } // namespace merge
 } // namespace ppbox
 
-#endif // _PPBOX_MERGE_P4_HAED_STRATEGY_H_
+#endif // _PPBOX_MERGE_MP4_HAED_STRATEGY_H_

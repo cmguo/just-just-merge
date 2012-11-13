@@ -17,7 +17,7 @@ namespace ppbox
         using ppbox::data::invalid_size;
 
         Mp4HeadStrategy::Mp4HeadStrategy(
-            ppbox::data::MediaBase & media, 
+            ppbox::data::SegmentMedia & media, 
             ppbox::data::SegmentBuffer & buffer)
             : HeadStrategy(media)
             , buffer_(buffer)

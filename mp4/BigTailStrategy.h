@@ -15,7 +15,7 @@ namespace ppbox
         {
         public:
             BigTailStrategy(
-                ppbox::data::MediaBase & media);
+                ppbox::data::SegmentMedia & media);
 
             virtual ~BigTailStrategy();
 

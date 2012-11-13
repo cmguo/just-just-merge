@@ -196,7 +196,8 @@ namespace ppbox
             open_response_type const & resp, 
             error_code & ec)
         {
-            ppbox::data::MediaBase * media = ppbox::data::MediaBase::create(io_svc(), play_link);
+            ppbox::data::SegmentMedia * media = 
+                (ppbox::data::SegmentMedia *)ppbox::data::MediaBase::create(io_svc(), play_link);
             //MergerBase * merger = new MergerBase(io_svc(), *media);
             MergerBase * merger = new Mp4Merger(io_svc(), *media);
             boost::mutex::scoped_lock lock(mutex_);

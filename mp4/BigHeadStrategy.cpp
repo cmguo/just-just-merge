@@ -11,7 +11,7 @@ namespace ppbox
     {
 
         BigHeadStrategy::BigHeadStrategy(
-            ppbox::data::MediaBase & media)
+            ppbox::data::SegmentMedia & media)
             : SegmentStrategy(media)
         {
         }

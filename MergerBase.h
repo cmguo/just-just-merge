@@ -16,7 +16,6 @@ namespace ppbox
 {
     namespace data
     {
-        class MediaBase;
         class SegmentStrategy;
         class ListStrategy;
         class SegmentSource;
@@ -37,7 +36,7 @@ namespace ppbox
         public:
             MergerBase(
                 boost::asio::io_service & io_svc, 
-                ppbox::data::MediaBase & media);
+                ppbox::data::SegmentMedia & media);
 
             virtual ~MergerBase();
 
@@ -82,7 +81,7 @@ namespace ppbox
                 return config_;
             }
 
-            ppbox::data::MediaBase const & media()
+            ppbox::data::SegmentMedia const & media()
             {
                 return media_;
             }
@@ -111,7 +110,7 @@ namespace ppbox
 
         protected:
             framework::configure::Config config_;
-            ppbox::data::MediaBase & media_;
+            ppbox::data::SegmentMedia & media_;
             ppbox::data::MediaInfo media_info_;
             ppbox::data::SegmentBuffer * buffer_;
 
