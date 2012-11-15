@@ -200,7 +200,18 @@ namespace ppbox
             boost::system::error_code & ec, 
             boost::system::error_code & ec_buf)
         {
-            buffer_->prepare_some(ec_buf);
+            buffer_->prepare_some(ec);
+
+            if (seek_pending_ && !byte_seek(read_.time_range.big_pos(), ec)) {
+                //if (ec == boost::asio::error::would_block) {
+                //    block_on();
+                //}
+                ec_buf = buffer_->last_error();
+                return 0;
+            }
+
+            ec_buf = buffer_->last_error();
+            ec.clear();
             return buffer_->in_avail() * media_info_.bitrate;
         }
 
