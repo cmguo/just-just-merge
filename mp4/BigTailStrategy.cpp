@@ -3,7 +3,7 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/mp4/BigTailStrategy.h"
 
-#include <ppbox/data/SourceError.h>
+#include <ppbox/data/base/SourceError.h>
 
 namespace ppbox
 {

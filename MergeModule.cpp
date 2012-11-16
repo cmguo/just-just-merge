@@ -7,8 +7,8 @@
 #include "ppbox/merge/MergeError.h"
 #include "ppbox/merge/Mp4Merger.h"
 
-#include "ppbox/data/MediaBase.h"
-#include "ppbox/data/SourceBase.h"
+#include "ppbox/data/base/MediaBase.h"
+#include "ppbox/data/base/SourceBase.h"
 
 #include <framework/logger/Logger.h>
 #include <framework/logger/StreamRecord.h>

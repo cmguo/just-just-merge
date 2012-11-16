@@ -3,7 +3,7 @@
 #ifndef _PPBOX_MERGE_MP4_BIG_BODY_STRATEGY_H_
 #define _PPBOX_MERGE_MP4_BIG_BODY_STRATEGY_H_
 
-#include <ppbox/data/SegmentStrategy.h>
+#include <ppbox/data/segment/SegmentStrategy.h>
 
 namespace ppbox
 {

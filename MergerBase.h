@@ -6,7 +6,7 @@
 #include "ppbox/merge/MergeBase.h"
 #include "ppbox/merge/MergeStatistic.h"
 
-#include <ppbox/data/SegmentPosition.h>
+#include <ppbox/data/segment/SegmentPosition.h>
 
 #include <framework/configure/Config.h>
 

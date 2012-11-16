@@ -5,7 +5,7 @@
 
 #include <ppbox/avformat/mp4/Mp4Merge.h>
 
-#include <ppbox/data/SegmentBuffer.h>
+#include <ppbox/data/segment/SegmentBuffer.h>
 
 #include <util/buffers/CycleBuffers.h>
 

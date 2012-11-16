@@ -3,10 +3,10 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/MergerBase.h"
 
-#include <ppbox/data/SourceError.h>
-#include <ppbox/data/SegmentSource.h>
-#include <ppbox/data/SegmentStrategy.h>
-#include <ppbox/data/SegmentBuffer.h>
+#include <ppbox/data/base/SourceError.h>
+#include <ppbox/data/segment/SegmentSource.h>
+#include <ppbox/data/segment/SegmentStrategy.h>
+#include <ppbox/data/segment/SegmentBuffer.h>
 #include <ppbox/data/strategy/ListStrategy.h>
 using namespace ppbox::data;
 
@@ -86,7 +86,7 @@ namespace ppbox
                 media_.get_info(media_info_, lec);
                 if (media_info_.bitrate == 0) {
                     if (media_info_.duration != 0) {
-                        media_info_.bitrate = media_info_.file_size / media_info_.duration;
+                        media_info_.bitrate = (boost::uint32_t)(media_info_.file_size / media_info_.duration);
                     }
                 }
                 set_strategys();
