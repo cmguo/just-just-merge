@@ -183,12 +183,20 @@ namespace ppbox
             media_.get_info(info, ec);
         }
 
-        void MergerBase::play_info(
-            PlayInfo & info)
+        void MergerBase::stream_status(
+            StreamStatus & info)
         {
             info.byte_range.beg = 0;
-            info.byte_range.pos = read_.time_range.big_pos();
             info.byte_range.end = strategy_->time_size();
+            info.byte_range.pos = read_.time_range.big_pos();
+            info.byte_range.buf = buffer_->out_position();
+
+            info.time_range.beg = 0;
+            info.time_range.end = ppbox::data::invalid_size;
+            info.time_range.pos = info.byte_range.pos / media_info_.bitrate;
+            info.time_range.buf = info.byte_range.buf / media_info_.bitrate;
+
+            info.buf_ec = buffer_->last_error();
         }
 
         boost::uint64_t MergerBase::get_buffer_size()

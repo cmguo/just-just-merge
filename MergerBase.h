@@ -64,8 +64,8 @@ namespace ppbox
             virtual void media_info(
                 MediaInfo & info);
 
-            virtual void play_info(
-                PlayInfo & info);
+            virtual void stream_status(
+                StreamStatus & info);
 
             boost::uint64_t get_buffer_size();
 
