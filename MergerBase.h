@@ -62,12 +62,15 @@ namespace ppbox
                 boost::system::error_code & ec);
 
             virtual void media_info(
-                MediaInfo & info);
+                MediaInfo & info) const;
+
+            virtual void stream_info(
+                std::vector<StreamInfo> & streams) const;
 
             virtual void stream_status(
-                StreamStatus & info);
+                StreamStatus & info) const;
 
-            boost::uint64_t get_buffer_size();
+            boost::uint64_t get_buffer_size() const;
 
             boost::uint64_t get_buffer_time(
                 boost::system::error_code & ec, 

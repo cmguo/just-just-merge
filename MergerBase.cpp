@@ -177,14 +177,21 @@ namespace ppbox
         }
 
         void MergerBase::media_info(
-            MediaInfo & info)
+            MediaInfo & info) const
         {
             boost::system::error_code ec;
             media_.get_info(info, ec);
         }
 
+        void MergerBase::stream_info(
+            std::vector<StreamInfo> & streams) const
+        {
+            // the interface is reserved for future use
+            // return nothing now
+        }
+
         void MergerBase::stream_status(
-            StreamStatus & info)
+            StreamStatus & info) const
         {
             info.byte_range.beg = 0;
             info.byte_range.end = strategy_->time_size();
@@ -199,7 +206,7 @@ namespace ppbox
             info.buf_ec = buffer_->last_error();
         }
 
-        boost::uint64_t MergerBase::get_buffer_size()
+        boost::uint64_t MergerBase::get_buffer_size() const
         {
             return buffer_->in_avail();
         }
