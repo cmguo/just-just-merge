@@ -39,6 +39,7 @@ namespace ppbox
             boost::system::error_code ec;
             source->set_non_block(true, ec);
             source_ = new ppbox::data::SegmentSource(*strategy_, *source);
+            source_->set_time_out(5000);
             buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
         }
 
