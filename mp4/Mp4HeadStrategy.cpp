@@ -92,7 +92,7 @@ namespace ppbox
             std::vector<ppbox::data::SegmentInfo> segments;
             for (size_t i = 0; i < media_.segment_count(); ++i) {
                 ppbox::data::SegmentInfo segment;
-                media_.segment_info(i, segment);
+                media_.segment_info(i, segment, ec);
                 segments.push_back(segment);
             }
             if (ppbox::avformat::mp4_merge_head(ios, ios, segments, ec)) {

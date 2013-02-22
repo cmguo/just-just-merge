@@ -29,10 +29,10 @@ namespace ppbox
                 ppbox::data::MediaInfo minfo;
                 media_.get_info(minfo, ec);
                 ppbox::data::SegmentInfo sinfo;
-                media_.segment_info(media_.segment_count() - 1, sinfo);
+                if (!media_.segment_info(media_.segment_count() - 1, sinfo, ec)) {
+                    return false;
+                }
                 pos.index = 0;
-                if (pos.url.is_valid())
-                    media_.get_url(pos.url, ec);
                 pos.size = minfo.file_size;
                 pos.byte_range.before_next();
                 pos.byte_range.beg = sinfo.offset + sinfo.size - sinfo.head_size;
@@ -51,10 +51,11 @@ namespace ppbox
         }
 
         bool BigTailStrategy::get_url(
-            ppbox::data::SegmentPosition & pos, 
+            ppbox::data::SegmentPosition const & pos, 
+            framework::string::Url & url, 
             boost::system::error_code & ec)
         {
-            return media_.get_url(pos.url, ec);
+            return media_.get_url(url, ec);
         }
 
     } // namespace data

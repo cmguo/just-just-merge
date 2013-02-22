@@ -25,7 +25,8 @@ namespace ppbox
                 boost::system::error_code & ec);
 
             virtual bool get_url(
-                ppbox::data::SegmentPosition & pos, 
+                ppbox::data::SegmentPosition const & pos, 
+                framework::string::Url & url, 
                 boost::system::error_code & ec);
         };
 
