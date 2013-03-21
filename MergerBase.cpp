@@ -34,8 +34,11 @@ namespace ppbox
             , read_size_(4 * 1024)
         {
             strategy_ = new ListStrategy(media);
-            ppbox::data::SourceBase * source = 
-                ppbox::data::SourceBase::create(media_.get_io_service(), media_);
+            ppbox::data::UrlSource * source = 
+                ppbox::data::UrlSource::create(media_.get_io_service(), media_.get_protocol());
+            if (source == NULL) {
+                source = ppbox::data::UrlSource::create(media_.get_io_service(), media_.segment_protocol());
+            }
             boost::system::error_code ec;
             source->set_non_block(true, ec);
             source_ = new ppbox::data::SegmentSource(*strategy_, *source);
@@ -50,8 +53,8 @@ namespace ppbox
                 buffer_ = NULL;
             }
             if (source_) {
-                ppbox::data::SourceBase * source = (ppbox::data::SourceBase *)&source_->source();
-                ppbox::data::SourceBase::destroy(source);
+                ppbox::data::UrlSource * source = (ppbox::data::UrlSource *)&source_->source();
+                ppbox::data::UrlSource::destroy(source);
                 delete source_;
                 source_ = NULL;
             }
