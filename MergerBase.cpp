@@ -95,6 +95,7 @@ namespace ppbox
                 }
                 set_strategys();
                 byte_seek(0, lec);
+                buffer_->set_track_count(1);
                 if (lec == boost::asio::error::would_block)
                     lec.clear();
             }
@@ -143,7 +144,10 @@ namespace ppbox
             Sample & sample,
             boost::system::error_code & ec)
         {
-            buffer_->drop_to(read_.time_range.pos, ec);
+            if (sample.memory) {
+               buffer_->putback(sample.memory);
+               sample.memory = NULL;
+            }
             buffer_->prepare_some(ec);
 
             if (seek_pending_ && !byte_seek(read_.time_range.big_pos(), ec)) {
@@ -163,7 +167,7 @@ namespace ppbox
                         sample.size = (size_t)(read_.time_range.end - read_.time_range.pos);
                     assert(sample.size > 0);
                     sample.data.clear();
-                    if (buffer_->fetch(read_.time_range.pos, sample.size, false, sample.data, ec)) {
+                    if (buffer_->fetch(0, read_.time_range.pos, sample.size, false, sample.data, ec)) {
                         read_.time_range.pos += sample.size;
                         break;
                     }
@@ -172,12 +176,24 @@ namespace ppbox
                         ec.clear();
                     }
                 } else {
-                    buffer_->drop_all(read_.time_range.end, ec);
+                    buffer_->read_next(read_.time_range.end, ec);
                     byte_seek(read_.time_range.big_end(), ec);
                 }
             }
 
             return !ec;
+        }
+
+        bool MergerBase::free(
+            Sample & sample,
+            boost::system::error_code & ec)
+        {
+            if (sample.memory) {
+                buffer_->putback(sample.memory);
+                sample.memory = NULL;
+            }
+            ec.clear();
+            return true;
         }
 
         void MergerBase::media_info(

@@ -7,7 +7,8 @@
 #include <ppbox/data/base/StreamStatus.h>
 #include <ppbox/data/segment/SegmentInfo.h>
 
-#include <ppbox/avformat/Format.h>
+#include <ppbox/avformat/StreamInfo.h>
+#include <ppbox/avformat/Sample.h>
 
 namespace ppbox
 {

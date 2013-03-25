@@ -61,6 +61,10 @@ namespace ppbox
                 Sample & sample,
                 boost::system::error_code & ec);
 
+            bool free(
+                Sample & sample,
+                boost::system::error_code & ec);
+
             virtual void media_info(
                 MediaInfo & info) const;
 
