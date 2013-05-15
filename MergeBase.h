@@ -7,8 +7,8 @@
 #include <ppbox/data/base/StreamStatus.h>
 #include <ppbox/data/segment/SegmentInfo.h>
 
-#include <ppbox/avformat/StreamInfo.h>
-#include <ppbox/avformat/Sample.h>
+#include <ppbox/avbase/StreamInfo.h>
+#include <ppbox/avbase/Sample.h>
 
 namespace ppbox
 {
@@ -19,8 +19,8 @@ namespace ppbox
         using ppbox::data::StreamStatus;
         using ppbox::data::SegmentInfo;
 
-        using ppbox::avformat::Sample;
-        using ppbox::avformat::StreamInfo;
+        using ppbox::avbase::Sample;
+        using ppbox::avbase::StreamInfo;
 
     } // namespace merge
 } // namespace ppbox
