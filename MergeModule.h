@@ -6,25 +6,23 @@
 #include <framework/string/Url.h>
 
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/function.hpp>
 
 namespace ppbox
 {
+    namespace data
+    {
+        class MediaBase;
+    }
+
     namespace merge
     {
 
         class MergerBase;
+        class Strategy;
 
         class MergeModule
             : public ppbox::common::CommonModuleBase<MergeModule>
         {
-        public:
-            typedef boost::function<void (
-                boost::system::error_code const &, 
-                MergerBase *)
-            > open_response_type;
-
         public:
             MergeModule(
                 util::daemon::Daemon & daemon);
@@ -37,60 +35,44 @@ namespace ppbox
             virtual void shutdown();
 
         public:
-            MergerBase * open(
+            void set_download_buffer_size(
+                boost::uint32_t buffer_size);
+
+        public:
+            MergerBase * create(
                 framework::string::Url const & play_link, 
-                size_t & close_token, 
+                framework::string::Url const & config, 
                 boost::system::error_code & ec);
 
-            void async_open(
-                framework::string::Url const & url, 
-                size_t & close_token, 
-                open_response_type const & resp);
-
-            boost::system::error_code close(
-                std::size_t close_token, 
+            bool destroy(
+                MergerBase * mergeer, 
                 boost::system::error_code & ec);
 
             MergerBase * find(
-                framework::string::Url const & url);
+                framework::string::Url const & play_link);
+
+            MergerBase * find(
+                ppbox::data::MediaBase const & media);
 
         private:
             struct MergeInfo;
 
         private:
-            MergeInfo * create(
+            MergeInfo * priv_create(
                 framework::string::Url const & play_link, 
-                open_response_type const & resp, 
+                framework::string::Url const & config, 
                 boost::system::error_code & ec);
 
-            void async_open(
-                boost::mutex::scoped_lock & lock, 
+            void priv_destroy(
                 MergeInfo * info);
 
-            void handle_open(
-                boost::system::error_code const & ec,
-                MergeInfo * info);
-
-            boost::system::error_code close_locked(
-                MergeInfo * info, 
-                bool inner_call, 
-                boost::system::error_code & ec);
-
-            boost::system::error_code close(
-                MergeInfo * info, 
-                boost::system::error_code & ec);
-
-            boost::system::error_code cancel(
-                MergeInfo * info, 
-                boost::system::error_code & ec);
-
-            void destory(
-                MergeInfo * info);
+        private:
+            // ≈‰÷√
+            boost::uint32_t buffer_size_;
 
         private:
             std::vector<MergeInfo *> mergers_;
             boost::mutex mutex_;
-            boost::condition_variable cond_;
         };
 
     } // namespace merge
