@@ -37,9 +37,10 @@ namespace ppbox
         {
             ec.clear();
             if (ready_) {
-                if (offset < head_size_ && offset < buffer_.data_begin()) {
+                if (offset < head_size_ && offset < buffer_.in_limit()) {
                     buffer.clear();
                     ready_ = false;
+                    head_size_ = 0;
                 }
             }
             if (!ready_) {
@@ -47,10 +48,12 @@ namespace ppbox
                     head_size_ = byte_size();
                 if (!buffer_.write_segment().valid()) {
                     ec = boost::asio::error::would_block;
+                } else if (buffer_.in_position() != 0) {
+                    ec = boost::asio::error::would_block;
                 } else if (buffer_.out_position() < head_size_) {
                     buffer_.prepare_at_least((size_t)(head_size_ - buffer_.out_position()), ec);
                 }
-                if (buffer_.out_position() >= head_size_) {
+                if (!ec) {
                     if (merge_head(ec)) {
                         ready_ = true;
                     }

@@ -167,7 +167,7 @@ namespace ppbox
                         sample.size = (size_t)(read_.time_range.end - read_.time_range.pos);
                     assert(sample.size > 0);
                     sample.data.clear();
-                    if (buffer_->fetch(0, read_.time_range.pos, sample.size, false, sample.data, ec)) {
+                    if ((sample.memory = buffer_->fetch(0, read_.time_range.pos, sample.size, false, sample.data, ec))) {
                         read_.time_range.pos += sample.size;
                         break;
                     }

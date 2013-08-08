@@ -152,7 +152,12 @@ namespace ppbox
             if (media == NULL) {
                 ec = error::format_not_match;
             } else {
-                MergerBase * merger = new Mp4Merger(io_svc(), *(ppbox::data::SegmentMedia *)media);
+                merger = new Mp4Merger(io_svc(), *(ppbox::data::SegmentMedia *)media);
+                if (merger == NULL) {
+                    ec = error::format_not_match;
+                } else {
+                    ppbox::common::apply_config(merger->config(), config, "merge.");
+                }
             }
             if (merger) {
                 MergeInfo * info = new MergeInfo;
