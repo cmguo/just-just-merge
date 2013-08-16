@@ -3,7 +3,7 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/MergerBase.h"
 
-#include <ppbox/data/base/SourceError.h>
+#include <ppbox/data/base/Error.h>
 #include <ppbox/data/segment/SegmentSource.h>
 #include <ppbox/data/segment/SegmentStrategy.h>
 #include <ppbox/data/segment/SegmentBuffer.h>
@@ -33,31 +33,10 @@ namespace ppbox
             , seek_pending_(false)
             , read_size_(4 * 1024)
         {
-            strategy_ = new ListStrategy(media);
-            ppbox::data::UrlSource * source = 
-                ppbox::data::UrlSource::create(media_.get_io_service(), media_.get_protocol());
-            if (source == NULL) {
-                source = ppbox::data::UrlSource::create(media_.get_io_service(), media_.segment_protocol());
-            }
-            boost::system::error_code ec;
-            source->set_non_block(true, ec);
-            source_ = new ppbox::data::SegmentSource(*strategy_, *source);
-            source_->set_time_out(5000);
-            buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
         }
 
         MergerBase::~MergerBase()
         {
-            if (buffer_) {
-                delete buffer_;
-                buffer_ = NULL;
-            }
-            if (source_) {
-                ppbox::data::UrlSource * source = (ppbox::data::UrlSource *)&source_->source();
-                ppbox::data::UrlSource::destroy(source);
-                delete source_;
-                source_ = NULL;
-            }
         }
 
         void MergerBase::async_open(
@@ -78,6 +57,17 @@ namespace ppbox
         {
             media_.close(ec);
             source_->close(ec);
+
+            if (buffer_) {
+                delete buffer_;
+                buffer_ = NULL;
+            }
+            if (source_) {
+                ppbox::data::UrlSource * source = (ppbox::data::UrlSource *)&source_->source();
+                ppbox::data::UrlSource::destroy(source);
+                delete source_;
+                source_ = NULL;
+            }
         }
 
         void MergerBase::handle_async(
@@ -87,17 +77,31 @@ namespace ppbox
             if (ec) {
                 LOG_WARN("[handle_async] media open, ec: " << ec.message());
             } else {
-                media_.get_info(media_info_, lec);
-                if (media_info_.bitrate == 0) {
-                    if (media_info_.duration != 0) {
-                        media_info_.bitrate = (boost::uint32_t)(media_info_.file_size / media_info_.duration);
-                    }
+                strategy_ = new ListStrategy(media_);
+                ppbox::data::UrlSource * source = 
+                    ppbox::data::UrlSource::create(media_.get_io_service(), media_.get_protocol(), lec);
+                if (source == NULL) {
+                    source = ppbox::data::UrlSource::create(media_.get_io_service(), media_.segment_protocol(), lec);
                 }
-                set_strategys();
-                byte_seek(0, lec);
-                buffer_->set_track_count(1);
-                if (lec == boost::asio::error::would_block)
-                    lec.clear();
+                if (source) {
+                    boost::system::error_code ec;
+                    source->set_non_block(true, ec);
+                    source_ = new ppbox::data::SegmentSource(*strategy_, *source);
+                    source_->set_time_out(5000);
+                    buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
+
+                    media_.get_info(media_info_, lec);
+                    if (media_info_.bitrate == 0) {
+                        if (media_info_.duration != 0) {
+                            media_info_.bitrate = (boost::uint32_t)(media_info_.file_size / media_info_.duration);
+                        }
+                    }
+                    set_strategys();
+                    byte_seek(0, lec);
+                    buffer_->set_track_count(1);
+                    if (lec == boost::asio::error::would_block)
+                        lec.clear();
+                }
             }
             response(lec);
         }

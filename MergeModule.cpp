@@ -147,11 +147,9 @@ namespace ppbox
         {
             framework::string::Url playlink(play_link);
             ppbox::common::decode_url(playlink, ec);
-            ppbox::data::MediaBase * media = ppbox::data::MediaBase::create(io_svc(), playlink);
+            ppbox::data::MediaBase * media = ppbox::data::MediaBase::create(io_svc(), playlink, ec);
             MergerBase * merger = NULL;
-            if (media == NULL) {
-                ec = error::format_not_match;
-            } else {
+            if (media) {
                 merger = new Mp4Merger(io_svc(), *(ppbox::data::SegmentMedia *)media);
                 if (merger == NULL) {
                     ec = error::format_not_match;

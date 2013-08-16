@@ -3,7 +3,7 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/mp4/BigHeadStrategy.h"
 
-#include <ppbox/data/base/SourceError.h>
+#include <ppbox/data/base/Error.h>
 
 namespace ppbox
 {
@@ -45,7 +45,7 @@ namespace ppbox
                 ec.clear();
                 return true;
             } else {
-                ec = ppbox::data::source_error::no_more_segment;
+                ec = ppbox::data::error::no_more_segment;
                 return false;
             }
         }

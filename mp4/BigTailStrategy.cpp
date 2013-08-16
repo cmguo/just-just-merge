@@ -3,7 +3,7 @@
 #include "ppbox/merge/Common.h"
 #include "ppbox/merge/mp4/BigTailStrategy.h"
 
-#include <ppbox/data/base/SourceError.h>
+#include <ppbox/data/base/Error.h>
 
 namespace ppbox
 {
@@ -34,6 +34,9 @@ namespace ppbox
                 }
                 pos.index = 0;
                 pos.size = minfo.file_size;
+                if (pos.size == ppbox::data::invalid_size) {
+                    pos.size = sinfo.offset + sinfo.size - sinfo.head_size;
+                }
                 pos.byte_range.before_next();
                 pos.byte_range.beg = sinfo.offset + sinfo.size - sinfo.head_size;
                 pos.byte_range.end = minfo.file_size;
@@ -45,7 +48,7 @@ namespace ppbox
                 ec.clear();
                 return true;
             } else {
-                ec = ppbox::data::source_error::no_more_segment;
+                ec = ppbox::data::error::no_more_segment;
                 return false;
             }
         }
