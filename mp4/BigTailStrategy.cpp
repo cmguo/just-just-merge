@@ -39,11 +39,11 @@ namespace ppbox
                 }
                 pos.byte_range.before_next();
                 pos.byte_range.beg = sinfo.offset + sinfo.size - sinfo.head_size;
-                pos.byte_range.end = minfo.file_size;
+                pos.byte_range.end = pos.size;
                 pos.byte_range.after_next();
                 pos.time_range.before_next();
                 pos.time_range.beg = sinfo.offset + sinfo.size - sinfo.head_size;
-                pos.time_range.end = minfo.file_size;
+                pos.time_range.end = pos.size;
                 pos.time_range.after_next();
                 ec.clear();
                 return true;

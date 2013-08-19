@@ -154,7 +154,7 @@ namespace ppbox
                 if (merger == NULL) {
                     ec = error::format_not_match;
                 } else {
-                    ppbox::common::apply_config(merger->config(), config, "merge.");
+                    ppbox::common::apply_config(merger->get_config(), config, "merge.");
                 }
             }
             if (merger) {

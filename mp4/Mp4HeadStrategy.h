@@ -44,6 +44,7 @@ namespace ppbox
             ppbox::data::SegmentBuffer & buffer_;
             bool ready_;
             boost::uint64_t head_size_;
+            boost::uint64_t merge_size_;
         };
 
     } // namespace merge

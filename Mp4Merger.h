@@ -3,7 +3,7 @@
 #ifndef _PPBOX_MERGE_MP4_MERGER_H_
 #define _PPBOX_MERGE_MP4_MERGER_H_
 
-#include "ppbox/merge/MergerBase.h"
+#include "ppbox/merge/Merger.h"
 
 namespace ppbox
 {
@@ -13,7 +13,7 @@ namespace ppbox
         class Mp4HeadStrategy;
 
         class Mp4Merger
-            : public MergerBase
+            : public Merger
         {
         public:
             Mp4Merger(

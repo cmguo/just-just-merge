@@ -23,6 +23,7 @@ namespace ppbox
             , buffer_(buffer)
             , ready_(false)
             , head_size_(0)
+            , merge_size_(0)
         {
         }
 
@@ -40,18 +41,22 @@ namespace ppbox
                 if (offset < head_size_ && offset < buffer_.in_limit()) {
                     buffer.clear();
                     ready_ = false;
-                    head_size_ = 0;
                 }
             }
             if (!ready_) {
                 if (head_size_ == 0)
                     head_size_ = byte_size();
+                if (media_.segment_count() == 1) {
+                    merge_size_ = head_size_;
+                    return true;
+                }
                 if (!buffer_.write_segment().valid()) {
                     ec = boost::asio::error::would_block;
                 } else if (buffer_.in_position() != 0) {
                     ec = boost::asio::error::would_block;
                 } else if (buffer_.out_position() < head_size_) {
-                    buffer_.prepare_at_least((size_t)(head_size_ - buffer_.out_position()), ec);
+                    if (!(ec = buffer_.last_error()))
+                        buffer_.prepare_at_least((size_t)(head_size_ - buffer_.out_position()), ec);
                 }
                 if (!ec) {
                     if (merge_head(ec)) {
@@ -66,9 +71,9 @@ namespace ppbox
             ppbox::data::SegmentPosition const & pos, 
             ppbox::data::SegmentRange & range)
         {
-            if (ready_) {
+            if (merge_size_) {
                 range.beg = 0;
-                range.end = head_size_ - range.big_offset;
+                range.end = merge_size_ - range.big_offset;
                 if (range.end > pos.head_size)
                     range.end = pos.head_size;
             } else {
@@ -99,7 +104,7 @@ namespace ppbox
                 segments.push_back(segment);
             }
             if (ppbox::avformat::mp4_merge_head(ios, ios, segments, ec)) {
-                head_size_ = cycle_buffers.out_position() - head_size_;
+                merge_size_ = cycle_buffers.out_position() - head_size_;
             }
             return !ec;
         }
