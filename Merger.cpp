@@ -52,6 +52,9 @@ namespace ppbox
         void Merger::cancel(
             boost::system::error_code & ec)
         {
+            if (source_) {
+                source_->cancel(ec);
+            }
             media_.cancel(ec);
         }
 
@@ -59,13 +62,13 @@ namespace ppbox
             boost::system::error_code & ec)
         {
             media_.close(ec);
-            source_->close(ec);
 
             if (buffer_) {
                 delete buffer_;
                 buffer_ = NULL;
             }
             if (source_) {
+                source_->close(ec);
                 ppbox::data::UrlSource * source = (ppbox::data::UrlSource *)&source_->source();
                 ppbox::data::UrlSource::destroy(source);
                 delete source_;
