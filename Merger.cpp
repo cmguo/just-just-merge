@@ -116,7 +116,7 @@ namespace ppbox
                     media_.get_info(media_info_, ec);
                     if (media_info_.bitrate == 0) {
                         if (media_info_.duration != 0) {
-                            media_info_.bitrate = (boost::uint32_t)(media_info_.file_size / media_info_.duration);
+                            media_info_.bitrate = (boost::uint32_t)(media_info_.file_size * 8000 / media_info_.duration);
                         }
                     }
                     set_strategys();
@@ -198,7 +198,7 @@ namespace ppbox
 
             while (!ec) {
                 if (read_.time_range.end > read_.time_range.pos) {
-                    sample.time = read_.time_range.big_pos() / media_info_.bitrate;
+                    sample.time = read_.time_range.big_pos() * 8000 / media_info_.bitrate;
                     sample.size = read_size_;
                     if (sample.size > read_.time_range.end - read_.time_range.pos)
                         sample.size = (size_t)(read_.time_range.end - read_.time_range.pos);
@@ -265,10 +265,16 @@ namespace ppbox
 
             info.time_range.beg = 0;
             info.time_range.end = ppbox::data::invalid_size;
-            info.time_range.pos = info.byte_range.pos / media_info_.bitrate;
-            info.time_range.buf = info.byte_range.buf / media_info_.bitrate;
+            info.time_range.pos = info.byte_range.pos * 8000 / media_info_.bitrate;
+            info.time_range.buf = info.byte_range.buf * 8000 / media_info_.bitrate;
 
             info.buf_ec = buffer_->last_error();
+        }
+
+        void Merger::data_stat(
+            DataStat & stat) const
+        {
+            stat = *source_;
         }
 
         void Merger::add_strategy(

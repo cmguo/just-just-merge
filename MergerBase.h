@@ -64,6 +64,9 @@ namespace ppbox
             virtual void stream_status(
                 StreamStatus & info) const = 0;
 
+            virtual void data_stat(
+                DataStat & stat) const = 0;
+
         public:
             boost::asio::io_service & get_io_service() const
             {

@@ -71,6 +71,9 @@ namespace ppbox
             virtual void stream_status(
                 StreamStatus & info) const;
 
+            virtual void data_stat(
+                DataStat & stat) const;
+
         public:
             ppbox::data::SegmentMedia const & media()
             {
