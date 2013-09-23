@@ -10,6 +10,8 @@
 #include <ppbox/data/strategy/ListStrategy.h>
 using namespace ppbox::data;
 
+#include <util/stream/UrlSource.h>
+
 #include <framework/logger/Logger.h>
 #include <framework/logger/StreamRecord.h>
 #include <framework/logger/StringRecord.h>
@@ -69,8 +71,8 @@ namespace ppbox
             }
             if (source_) {
                 source_->close(ec);
-                ppbox::data::UrlSource * source = (ppbox::data::UrlSource *)&source_->source();
-                ppbox::data::UrlSource::destroy(source);
+                util::stream::UrlSource * source = const_cast<util::stream::UrlSource *>(&source_->source());
+                util::stream::UrlSource::destroy(source);
                 delete source_;
                 source_ = NULL;
             }
@@ -91,10 +93,10 @@ namespace ppbox
                 case closed:
                     {
                         strategy_ = new ListStrategy(media_);
-                        ppbox::data::UrlSource * source = 
-                            ppbox::data::UrlSource::create(get_io_service(), media_.get_protocol(), ec);
+                        util::stream::UrlSource * source = 
+                            util::stream::UrlSource::create(get_io_service(), media_.get_protocol(), ec);
                         if (source == NULL) {
-                            source = ppbox::data::UrlSource::create(get_io_service(), media_.segment_protocol(), ec);
+                            source = util::stream::UrlSource::create(get_io_service(), media_.segment_protocol(), ec);
                         }
                         if (source) {
                             boost::system::error_code ec;

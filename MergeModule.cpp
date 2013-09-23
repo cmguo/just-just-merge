@@ -8,7 +8,6 @@
 #include "ppbox/merge/Mp4Merger.h"
 
 #include <ppbox/data/base/MediaBase.h>
-#include <ppbox/data/base/SourceBase.h>
 
 #include <ppbox/common/UrlHelper.h>
 
