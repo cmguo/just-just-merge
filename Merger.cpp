@@ -72,7 +72,7 @@ namespace ppbox
             if (source_) {
                 source_->close(ec);
                 util::stream::UrlSource * source = const_cast<util::stream::UrlSource *>(&source_->source());
-                util::stream::UrlSource::destroy(source);
+                util::stream::UrlSourceFactory::destroy(source);
                 delete source_;
                 source_ = NULL;
             }
@@ -94,9 +94,9 @@ namespace ppbox
                     {
                         strategy_ = new ListStrategy(media_);
                         util::stream::UrlSource * source = 
-                            util::stream::UrlSource::create(get_io_service(), media_.get_protocol(), ec);
+                            util::stream::UrlSourceFactory::create(get_io_service(), media_.get_protocol(), ec);
                         if (source == NULL) {
-                            source = util::stream::UrlSource::create(get_io_service(), media_.segment_protocol(), ec);
+                            source = util::stream::UrlSourceFactory::create(get_io_service(), media_.segment_protocol(), ec);
                         }
                         if (source) {
                             boost::system::error_code ec;
