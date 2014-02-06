@@ -9,10 +9,15 @@
 
 #include <util/buffers/CycleBuffers.h>
 
+#include <framework/logger/Logger.h>
+#include <framework/logger/StreamRecord.h>
+
 namespace ppbox
 {
     namespace merge
     {
+
+        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("ppbox.merge.Mp4HeadStrategy", framework::logger::Debug);
 
         using ppbox::data::invalid_size;
 
@@ -39,6 +44,7 @@ namespace ppbox
             ec.clear();
             if (ready_) {
                 if (offset < head_size_ && offset < buffer_.in_limit()) {
+                    LOG_DEBUG("check offset " << offset << ", clear all data!!");
                     buffer.clear();
                     ready_ = false;
                 }

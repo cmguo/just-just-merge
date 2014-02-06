@@ -18,12 +18,12 @@ using namespace ppbox::data;
 
 #include <boost/bind.hpp>
 
-FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("Merger", framework::logger::Debug);
-
 namespace ppbox
 {
     namespace merge
     {
+
+        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("ppbox.merge.Merger", framework::logger::Debug);
 
         Merger::Merger(
             boost::asio::io_service & io_svc, 

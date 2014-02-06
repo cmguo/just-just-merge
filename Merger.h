@@ -92,7 +92,7 @@ namespace ppbox
                 ppbox::data::SegmentStrategy & strategy);
 
         private:
-            enum StateEnum            {                closed,                media_open,                merger_open,                opened,            };
+            enum StateEnum            {                closed,                media_open,                merger_open,                opened,            };
         private:
             void response(
                 boost::system::error_code const & ec);
