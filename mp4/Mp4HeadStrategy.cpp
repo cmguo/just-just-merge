@@ -94,9 +94,9 @@ namespace ppbox
                     boost::asio::buffer_size(buffers[i]));
                 mutable_buffers.push_back(buffer);
             }
-            util::buffers::CycleBuffers<std::vector<boost::asio::mutable_buffer> > cycle_buffers(mutable_buffers);
+            util::buffers::CycleBuffers<std::vector<boost::asio::mutable_buffer>, boost::uint8_t> cycle_buffers(mutable_buffers);
             cycle_buffers.commit(head_size_);
-            std::iostream ios(&cycle_buffers);
+            std::basic_iostream<boost::uint8_t> ios(&cycle_buffers);
             std::vector<ppbox::data::SegmentInfo> segments;
             for (size_t i = 0; i < media_.segment_count(); ++i) {
                 ppbox::data::SegmentInfo segment;
