@@ -168,6 +168,9 @@ namespace ppbox
                 ec = boost::asio::error::would_block;
                 return false;
             } else {
+                LOG_INFO("[byte_seek] offset: " << offset 
+                    << " segment: " << read_.index
+                    << " position: " << read_.byte_range.pos);
                 seek_pending_ = false;
                 return true;
             }

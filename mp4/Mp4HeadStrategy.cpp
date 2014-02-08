@@ -44,9 +44,10 @@ namespace ppbox
             ec.clear();
             if (ready_) {
                 if (offset < head_size_ && offset < buffer_.in_limit()) {
-                    LOG_DEBUG("check offset " << offset << ", clear all data!!");
+                    LOG_INFO("check offset " << offset << ", clear all data!!");
                     buffer.clear();
                     ready_ = false;
+                    merge_size_ = 0;
                 }
             }
             if (!ready_) {
