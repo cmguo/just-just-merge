@@ -3,7 +3,9 @@
 #ifndef   _PPBOX_SEGMENT_MERGE_STATISTIC_H_
 #define   _PPBOX_SEGMENT_MERGE_STATISTIC_H_
 
-#include <framework/timer/TickCounter.h>
+#include "ppbox/merge/MergerBase.h"
+
+#include <ppbox/data/base/StreamStatistic.h>
 
 namespace ppbox
 {
@@ -32,33 +34,17 @@ namespace ppbox
         };
 
         class MergeStatistic
+            : public ppbox::data::StreamStatistic
         {
         public:
-            MergeStatistic();
+            MergeStatistic(
+                MergerBase & merger);
 
-            ~MergeStatistic();
-
-            void open(
-                std::string name,
-                boost::uint32_t head_size,
-                boost::uint32_t tail_size,
-                boost::uint32_t body_size);
-
-            void increase(
-                boost::uint32_t bytes,
-                boost::uint64_t offset);
-
-            boost::system::error_code get_info_statictis(MergeStatInfo & info) const;
-
-            boost::uint64_t const & offset(void) const;
-
-            void close(void);
+            virtual void update_stat(
+                boost::system::error_code & ec);
 
         private:
-            std::string name_;
-            MergeStatInfo info_;
-            framework::timer::TickCounter tick_counter_;
-            boost::uint32_t increase_bytes_;
+            MergerBase & merger_;
         };
     }
 }

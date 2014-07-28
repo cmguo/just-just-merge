@@ -29,6 +29,7 @@ namespace ppbox
             boost::asio::io_service & io_svc, 
             ppbox::data::SegmentMedia & media)
             : MergerBase(io_svc)
+            , MergeStatistic((MergerBase &)(*this))
             , media_(media)
             , buffer_(NULL)
             , source_(NULL)
@@ -91,6 +92,11 @@ namespace ppbox
 
             switch(open_state_) {
                 case closed:
+                    open_state_ = media_open;
+                    MergeStatistic::open_beg_media();
+                    media_.async_open(boost::bind(&Merger::handle_async, this, _1));
+                    break;
+                case media_open:
                     {
                         strategy_ = new ListStrategy(media_);
                         util::stream::UrlSource * source = 
@@ -105,16 +111,13 @@ namespace ppbox
                             source_->set_time_out(5000);
                             buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
                         } else {
-                            media_.get_io_service().post(
-                                boost::bind(&Merger::response, this, ec));
+                            StreamStatistic::open_end();
+                            response(ec);
                             break;
                         }
                     }
-                    open_state_ = media_open;
-                    media_.async_open(boost::bind(&Merger::handle_async, this, _1));
-                    break;
-                case media_open:
                     open_state_ = merger_open;
+                    MergeStatistic::open_beg_stream();
                     media_.get_info(media_info_, ec);
                     if (media_info_.bitrate == 0) {
                         if (media_info_.duration != 0) {
@@ -127,12 +130,14 @@ namespace ppbox
                     if (!ec && byte_seek(0, ec)) {
                         buffer_->set_track_count(1);
                         open_state_ = opened;
+                        StreamStatistic::open_end();
                         response(ec);
                     } else if (ec == boost::asio::error::would_block) {
                         buffer_->async_prepare_some(0, 
                             boost::bind(&Merger::handle_async, this, _1));
                     } else {
                         open_state_ = opened;
+                        StreamStatistic::open_end();
                         response(ec);
                     }
                     break;
@@ -153,25 +158,30 @@ namespace ppbox
             boost::uint64_t offset, 
             boost::system::error_code & ec)
         {
-            if (!strategy_->time_seek(offset, read_, ec))
+            if (!strategy_->time_seek(offset, read_, ec)) {
+                MergeStatistic::seek(false, offset);
                 return false;
+            }
             if (read_.time_range.beg == invalid_size) {
                 read_.time_range.big_offset += invalid_size;
                 read_.time_range.pos = 0;
             }
             read_.byte_range.pos = read_.time_range.pos;
             if (!buffer_->seek(read_, ec)) {
+                MergeStatistic::seek(false, offset);
                 return false;
             }
             if (read_.time_range.beg == invalid_size) {
                 seek_pending_ = true;
                 ec = boost::asio::error::would_block;
+                MergeStatistic::seek(false, offset);
                 return false;
             } else {
                 LOG_INFO("[byte_seek] offset: " << offset 
                     << " segment: " << read_.index
                     << " position: " << read_.byte_range.pos);
                 seek_pending_ = false;
+                MergeStatistic::seek(true, offset);
                 return true;
             }
         }
@@ -211,6 +221,7 @@ namespace ppbox
                     sample.data.clear();
                     if ((sample.memory = buffer_->fetch(0, read_.time_range.pos, sample.size, false, sample.data, ec))) {
                         read_.time_range.pos += sample.size;
+                        MergeStatistic::play_on(sample.time);
                         break;
                     }
                     if (ec == boost::asio::error::eof && read_.time_range.end == invalid_size) {
