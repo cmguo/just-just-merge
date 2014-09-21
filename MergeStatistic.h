@@ -5,7 +5,7 @@
 
 #include "ppbox/merge/MergerBase.h"
 
-#include <ppbox/data/base/StreamStatistic.h>
+#include <ppbox/avbase/StreamStatistic.h>
 
 namespace ppbox
 {
@@ -34,7 +34,7 @@ namespace ppbox
         };
 
         class MergeStatistic
-            : public ppbox::data::StreamStatistic
+            : public ppbox::avbase::StreamStatistic
         {
         public:
             MergeStatistic(
