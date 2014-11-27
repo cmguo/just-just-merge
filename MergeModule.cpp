@@ -1,15 +1,15 @@
 // MergerModule.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/MergeModule.h"
-#include "ppbox/merge/Version.h"
-#include "ppbox/merge/MergerBase.h"
-#include "ppbox/merge/MergeError.h"
-#include "ppbox/merge/Mp4Merger.h"
+#include "just/merge/Common.h"
+#include "just/merge/MergeModule.h"
+#include "just/merge/Version.h"
+#include "just/merge/MergerBase.h"
+#include "just/merge/MergeError.h"
+#include "just/merge/Mp4Merger.h"
 
-#include <ppbox/data/base/MediaBase.h>
+#include <just/data/base/MediaBase.h>
 
-#include <ppbox/common/UrlHelper.h>
+#include <just/common/UrlHelper.h>
 
 #include <framework/timer/Timer.h>
 #include <framework/logger/Logger.h>
@@ -18,16 +18,16 @@
 #include <boost/bind.hpp>
 using namespace boost::system;
 
-FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("ppbox.merge.MergeModule", framework::logger::Debug);
+FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("just.merge.MergeModule", framework::logger::Debug);
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
         struct MergeModule::MergeInfo
         {
-            ppbox::data::MediaBase * media;
+            just::data::MediaBase * media;
             MergerBase * merger;
             framework::string::Url play_link;
             error_code ec;
@@ -59,7 +59,7 @@ namespace ppbox
 
         MergeModule::MergeModule(
             util::daemon::Daemon & daemon)
-            : ppbox::common::CommonModuleBase<MergeModule>(daemon, "MergeModule")
+            : just::common::CommonModuleBase<MergeModule>(daemon, "MergeModule")
         {
             buffer_size_ = 20 * 1024 * 1024;
         }
@@ -127,7 +127,7 @@ namespace ppbox
         }
 
         MergerBase * MergeModule::find(
-            ppbox::data::MediaBase const & media)
+            just::data::MediaBase const & media)
         {
             boost::mutex::scoped_lock lock(mutex_);
             std::vector<MergeInfo *>::const_iterator iter = mergers_.begin();
@@ -145,15 +145,15 @@ namespace ppbox
             error_code & ec)
         {
             framework::string::Url playlink(play_link);
-            ppbox::common::decode_url(playlink, ec);
-            ppbox::data::MediaBase * media = ppbox::data::MediaBase::create(io_svc(), playlink, ec);
+            just::common::decode_url(playlink, ec);
+            just::data::MediaBase * media = just::data::MediaBase::create(io_svc(), playlink, ec);
             MergerBase * merger = NULL;
             if (media) {
-                merger = new Mp4Merger(io_svc(), *(ppbox::data::SegmentMedia *)media);
+                merger = new Mp4Merger(io_svc(), *(just::data::SegmentMedia *)media);
                 if (merger == NULL) {
                     ec = error::format_not_match;
                 } else {
-                    ppbox::common::apply_config(merger->get_config(), config, "merge.");
+                    just::common::apply_config(merger->get_config(), config, "merge.");
                 }
             }
             if (merger) {
@@ -190,4 +190,4 @@ namespace ppbox
         }
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just

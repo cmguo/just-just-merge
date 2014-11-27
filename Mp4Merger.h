@@ -1,11 +1,11 @@
 // Mp4Merger.h
 
-#ifndef _PPBOX_MERGE_MP4_MERGER_H_
-#define _PPBOX_MERGE_MP4_MERGER_H_
+#ifndef _JUST_MERGE_MP4_MERGER_H_
+#define _JUST_MERGE_MP4_MERGER_H_
 
-#include "ppbox/merge/Merger.h"
+#include "just/merge/Merger.h"
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
@@ -18,7 +18,7 @@ namespace ppbox
         public:
             Mp4Merger(
                 boost::asio::io_service & io_svc, 
-                ppbox::data::SegmentMedia & media);
+                just::data::SegmentMedia & media);
 
             virtual ~Mp4Merger();
 
@@ -36,6 +36,6 @@ namespace ppbox
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MP4_MERGER_H_
+#endif // _JUST_MERGE_MP4_MERGER_H_

@@ -1,36 +1,36 @@
 // BigHeadStrategy.h
 
-#ifndef _PPBOX_MERGE_MP4_BIG_HAED_STRATEGY_H_
-#define _PPBOX_MERGE_MP4_BIG_HAED_STRATEGY_H_
+#ifndef _JUST_MERGE_MP4_BIG_HAED_STRATEGY_H_
+#define _JUST_MERGE_MP4_BIG_HAED_STRATEGY_H_
 
-#include <ppbox/data/segment/SegmentStrategy.h>
+#include <just/data/segment/SegmentStrategy.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
         class BigHeadStrategy
-            : public ppbox::data::SegmentStrategy
+            : public just::data::SegmentStrategy
         {
         public:
             BigHeadStrategy(
-                ppbox::data::SegmentMedia & media);
+                just::data::SegmentMedia & media);
 
             virtual ~BigHeadStrategy();
 
         public:
             virtual bool next_segment(
-                ppbox::data::SegmentPosition & info, 
+                just::data::SegmentPosition & info, 
                 boost::system::error_code & ec);
 
             virtual bool get_url(
-                ppbox::data::SegmentPosition const & pos, 
+                just::data::SegmentPosition const & pos, 
                 framework::string::Url & url, 
                 boost::system::error_code & ec);
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MP4_BIG_HAED_STRATEGY_H_
+#endif // _JUST_MERGE_MP4_BIG_HAED_STRATEGY_H_

@@ -1,13 +1,13 @@
 // MergerBase.h
 
-#ifndef _PPBOX_MERGE_MERGER_BASE_H_
-#define _PPBOX_MERGE_MERGER_BASE_H_
+#ifndef _JUST_MERGE_MERGER_BASE_H_
+#define _JUST_MERGE_MERGER_BASE_H_
 
-#include "ppbox/merge/MergeBase.h"
+#include "just/merge/MergeBase.h"
 
 #include <framework/configure/Config.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
@@ -86,6 +86,6 @@ namespace ppbox
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MERGER_BASE_H_
+#endif // _JUST_MERGE_MERGER_BASE_H_

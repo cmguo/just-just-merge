@@ -1,11 +1,11 @@
 // Mp4HeadStrategy.h
 
-#ifndef _PPBOX_MERGE_MP4_HAED_STRATEGY_H_
-#define _PPBOX_MERGE_MP4_HAED_STRATEGY_H_
+#ifndef _JUST_MERGE_MP4_HAED_STRATEGY_H_
+#define _JUST_MERGE_MP4_HAED_STRATEGY_H_
 
-#include <ppbox/data/strategy/HeadStrategy.h>
+#include <just/data/strategy/HeadStrategy.h>
 
-namespace ppbox
+namespace just
 {
     namespace data
     {
@@ -16,24 +16,24 @@ namespace ppbox
     {
 
         class Mp4HeadStrategy
-            : public ppbox::data::HeadStrategy
+            : public just::data::HeadStrategy
         {
         public:
             Mp4HeadStrategy(
-                ppbox::data::SegmentMedia & media, 
-                ppbox::data::SegmentBuffer & buffer);
+                just::data::SegmentMedia & media, 
+                just::data::SegmentBuffer & buffer);
 
             virtual ~Mp4HeadStrategy();
 
         public:
             virtual void time_range(
-                ppbox::data::SegmentPosition const & pos, 
-                ppbox::data::SegmentRange & range);
+                just::data::SegmentPosition const & pos, 
+                just::data::SegmentRange & range);
 
         public:
             bool check(
                 boost::uint64_t offset, 
-                ppbox::data::SegmentBuffer & buffer, 
+                just::data::SegmentBuffer & buffer, 
                 boost::system::error_code & ec);
 
         private:
@@ -41,13 +41,13 @@ namespace ppbox
                 boost::system::error_code & ec);
 
         private:
-            ppbox::data::SegmentBuffer & buffer_;
+            just::data::SegmentBuffer & buffer_;
             bool ready_;
             boost::uint64_t head_size_;
             boost::uint64_t merge_size_;
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MP4_HAED_STRATEGY_H_
+#endif // _JUST_MERGE_MP4_HAED_STRATEGY_H_

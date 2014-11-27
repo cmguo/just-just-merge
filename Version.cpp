@@ -1,5 +1,5 @@
 // Version.cpp
 
-#include "ppbox/merge/Common.h"
+#include "just/merge/Common.h"
 #define VERSION_SOURCE
-#include "ppbox/merge/Version.h"
+#include "just/merge/Version.h"

@@ -1,29 +1,29 @@
 // Mp4HeadStrategy.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/mp4/Mp4HeadStrategy.h"
+#include "just/merge/Common.h"
+#include "just/merge/mp4/Mp4HeadStrategy.h"
 
-#include <ppbox/avformat/mp4/Mp4Merge.h>
+#include <just/avformat/mp4/Mp4Merge.h>
 
-#include <ppbox/data/segment/SegmentBuffer.h>
+#include <just/data/segment/SegmentBuffer.h>
 
 #include <util/buffers/CycleBuffers.h>
 
 #include <framework/logger/Logger.h>
 #include <framework/logger/StreamRecord.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
-        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("ppbox.merge.Mp4HeadStrategy", framework::logger::Debug);
+        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("just.merge.Mp4HeadStrategy", framework::logger::Debug);
 
-        using ppbox::data::invalid_size;
+        using just::data::invalid_size;
 
         Mp4HeadStrategy::Mp4HeadStrategy(
-            ppbox::data::SegmentMedia & media, 
-            ppbox::data::SegmentBuffer & buffer)
+            just::data::SegmentMedia & media, 
+            just::data::SegmentBuffer & buffer)
             : HeadStrategy(media)
             , buffer_(buffer)
             , ready_(false)
@@ -38,7 +38,7 @@ namespace ppbox
 
         bool Mp4HeadStrategy::check(
             boost::uint64_t offset, 
-            ppbox::data::SegmentBuffer & buffer, 
+            just::data::SegmentBuffer & buffer, 
             boost::system::error_code & ec)
         {
             ec.clear();
@@ -75,8 +75,8 @@ namespace ppbox
         }
 
         void Mp4HeadStrategy::time_range(
-            ppbox::data::SegmentPosition const & pos, 
-            ppbox::data::SegmentRange & range)
+            just::data::SegmentPosition const & pos, 
+            just::data::SegmentRange & range)
         {
             if (merge_size_) {
                 range.beg = 0;
@@ -104,17 +104,17 @@ namespace ppbox
             util::buffers::CycleBuffers<std::vector<boost::asio::mutable_buffer>, boost::uint8_t> cycle_buffers(mutable_buffers);
             cycle_buffers.commit((size_t)head_size_);
             std::basic_iostream<boost::uint8_t> ios(&cycle_buffers);
-            std::vector<ppbox::data::SegmentInfo> segments;
+            std::vector<just::data::SegmentInfo> segments;
             for (size_t i = 0; i < media_.segment_count(); ++i) {
-                ppbox::data::SegmentInfo segment;
+                just::data::SegmentInfo segment;
                 media_.segment_info(i, segment, ec);
                 segments.push_back(segment);
             }
-            if (ppbox::avformat::mp4_merge_head(ios, ios, segments, ec)) {
+            if (just::avformat::mp4_merge_head(ios, ios, segments, ec)) {
                 merge_size_ = cycle_buffers.out_position() - head_size_;
             }
             return !ec;
         }
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just

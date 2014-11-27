@@ -1,13 +1,13 @@
 // MergeModule.h
 
-#ifndef _PPBOX_MERGE_MERGE_MODULE_H_
-#define _PPBOX_MERGE_MERGE_MODULE_H_
+#ifndef _JUST_MERGE_MERGE_MODULE_H_
+#define _JUST_MERGE_MERGE_MODULE_H_
 
 #include <framework/string/Url.h>
 
 #include <boost/thread/mutex.hpp>
 
-namespace ppbox
+namespace just
 {
     namespace data
     {
@@ -21,7 +21,7 @@ namespace ppbox
         class Strategy;
 
         class MergeModule
-            : public ppbox::common::CommonModuleBase<MergeModule>
+            : public just::common::CommonModuleBase<MergeModule>
         {
         public:
             MergeModule(
@@ -52,7 +52,7 @@ namespace ppbox
                 framework::string::Url const & play_link);
 
             MergerBase * find(
-                ppbox::data::MediaBase const & media);
+                just::data::MediaBase const & media);
 
         private:
             struct MergeInfo;
@@ -76,6 +76,6 @@ namespace ppbox
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MERGE_MODULE_H_
+#endif // _JUST_MERGE_MERGE_MODULE_H_

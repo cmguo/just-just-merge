@@ -1,15 +1,15 @@
 // BigBodyStrategy.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/mp4/BigBodyStrategy.h"
+#include "just/merge/Common.h"
+#include "just/merge/mp4/BigBodyStrategy.h"
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
         BigBodyStrategy::BigBodyStrategy(
-            ppbox::data::SegmentMedia & media)
+            just::data::SegmentMedia & media)
             : SegmentStrategy(media)
         {
         }
@@ -19,20 +19,20 @@ namespace ppbox
         }
 
         void BigBodyStrategy::byte_range(
-            ppbox::data::SegmentPosition const & pos, 
-            ppbox::data::SegmentRange & range)
+            just::data::SegmentPosition const & pos, 
+            just::data::SegmentRange & range)
         {
             range.beg = pos.head_size + (range.big_offset - pos.offset);
             range.end = pos.size;
         }
 
         void BigBodyStrategy::time_range(
-            ppbox::data::SegmentPosition const & pos, 
-            ppbox::data::SegmentRange & range)
+            just::data::SegmentPosition const & pos, 
+            just::data::SegmentRange & range)
         {
             range.beg = pos.head_size + (range.big_offset - pos.offset);
             range.end = pos.size;
         }
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just

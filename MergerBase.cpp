@@ -1,9 +1,9 @@
 // MergerBase.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/MergerBase.h"
+#include "just/merge/Common.h"
+#include "just/merge/MergerBase.h"
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
@@ -19,4 +19,4 @@ namespace ppbox
         }
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just

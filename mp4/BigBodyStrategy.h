@@ -1,35 +1,35 @@
 // BigBodyStrategy.h
 
-#ifndef _PPBOX_MERGE_MP4_BIG_BODY_STRATEGY_H_
-#define _PPBOX_MERGE_MP4_BIG_BODY_STRATEGY_H_
+#ifndef _JUST_MERGE_MP4_BIG_BODY_STRATEGY_H_
+#define _JUST_MERGE_MP4_BIG_BODY_STRATEGY_H_
 
-#include <ppbox/data/segment/SegmentStrategy.h>
+#include <just/data/segment/SegmentStrategy.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
         class BigBodyStrategy
-            : public ppbox::data::SegmentStrategy
+            : public just::data::SegmentStrategy
         {
         public:
             BigBodyStrategy(
-                ppbox::data::SegmentMedia & media);
+                just::data::SegmentMedia & media);
 
             virtual ~BigBodyStrategy();
 
         private:
             virtual void byte_range(
-                ppbox::data::SegmentPosition const & pos, 
-                ppbox::data::SegmentRange & range);
+                just::data::SegmentPosition const & pos, 
+                just::data::SegmentRange & range);
 
             virtual void time_range(
-                ppbox::data::SegmentPosition const & pos, 
-                ppbox::data::SegmentRange & range);
+                just::data::SegmentPosition const & pos, 
+                just::data::SegmentRange & range);
         };
 
     } // namespace data
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MP4_BIG_BODY_STRATEGY_H_
+#endif // _JUST_MERGE_MP4_BIG_BODY_STRATEGY_H_

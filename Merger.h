@@ -1,14 +1,14 @@
 // Merger.h
 
-#ifndef _PPBOX_MERGE_MERGER_H_
-#define _PPBOX_MERGE_MERGER_H_
+#ifndef _JUST_MERGE_MERGER_H_
+#define _JUST_MERGE_MERGER_H_
 
-#include "ppbox/merge/MergerBase.h"
-#include "ppbox/merge/MergeStatistic.h"
+#include "just/merge/MergerBase.h"
+#include "just/merge/MergeStatistic.h"
 
-#include <ppbox/data/segment/SegmentPosition.h>
+#include <just/data/segment/SegmentPosition.h>
 
-namespace ppbox
+namespace just
 {
     namespace data
     {
@@ -28,7 +28,7 @@ namespace ppbox
         public:
             Merger(
                 boost::asio::io_service & io_svc, 
-                ppbox::data::SegmentMedia & media);
+                just::data::SegmentMedia & media);
 
             virtual ~Merger();
 
@@ -75,12 +75,12 @@ namespace ppbox
                 DataStat & stat) const;
 
         public:
-            ppbox::data::SegmentMedia const & media()
+            just::data::SegmentMedia const & media()
             {
                 return media_;
             }
 
-            ppbox::data::SegmentSource const & source()
+            just::data::SegmentSource const & source()
             {
                 return *source_;
             }
@@ -89,7 +89,7 @@ namespace ppbox
             virtual void set_strategys() = 0;
 
             void add_strategy(
-                ppbox::data::SegmentStrategy & strategy);
+                just::data::SegmentStrategy & strategy);
 
         private:
             enum StateEnum            {                closed,                media_open,                merger_open,                opened,            };
@@ -101,24 +101,24 @@ namespace ppbox
                 boost::system::error_code const & ec);
 
         protected:
-            ppbox::data::SegmentMedia & media_;
-            ppbox::data::MediaInfo media_info_;
-            ppbox::data::SegmentBuffer * buffer_;
+            just::data::SegmentMedia & media_;
+            just::data::MediaInfo media_info_;
+            just::data::SegmentBuffer * buffer_;
 
         private:
-            ppbox::data::SegmentSource * source_;
-            ppbox::data::ListStrategy * strategy_;
+            just::data::SegmentSource * source_;
+            just::data::ListStrategy * strategy_;
 
             StateEnum open_state_;
             bool seek_pending_;
 
-            ppbox::data::SegmentPosition read_;
+            just::data::SegmentPosition read_;
             boost::uint32_t read_size_; // 读取一次，最大的读取数据大小
 
             response_type resp_;
         };
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just
 
-#endif // _PPBOX_MERGE_MERGER_H_
+#endif // _JUST_MERGE_MERGER_H_

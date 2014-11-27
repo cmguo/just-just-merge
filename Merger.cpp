@@ -1,14 +1,14 @@
 // Merger.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/Merger.h"
+#include "just/merge/Common.h"
+#include "just/merge/Merger.h"
 
-#include <ppbox/data/base/Error.h>
-#include <ppbox/data/segment/SegmentSource.h>
-#include <ppbox/data/segment/SegmentStrategy.h>
-#include <ppbox/data/segment/SegmentBuffer.h>
-#include <ppbox/data/strategy/ListStrategy.h>
-using namespace ppbox::data;
+#include <just/data/base/Error.h>
+#include <just/data/segment/SegmentSource.h>
+#include <just/data/segment/SegmentStrategy.h>
+#include <just/data/segment/SegmentBuffer.h>
+#include <just/data/strategy/ListStrategy.h>
+using namespace just::data;
 
 #include <util/stream/UrlSource.h>
 
@@ -18,16 +18,16 @@ using namespace ppbox::data;
 
 #include <boost/bind.hpp>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
-        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("ppbox.merge.Merger", framework::logger::Debug);
+        FRAMEWORK_LOGGER_DECLARE_MODULE_LEVEL("just.merge.Merger", framework::logger::Debug);
 
         Merger::Merger(
             boost::asio::io_service & io_svc, 
-            ppbox::data::SegmentMedia & media)
+            just::data::SegmentMedia & media)
             : MergerBase(io_svc)
             , MergeStatistic((MergerBase &)(*this))
             , media_(media)
@@ -107,7 +107,7 @@ namespace ppbox
                         if (source) {
                             boost::system::error_code ec;
                             source->set_non_block(true, ec);
-                            source_ = new ppbox::data::SegmentSource(*strategy_, *source);
+                            source_ = new just::data::SegmentSource(*strategy_, *source);
                             source_->set_time_out(5000);
                             buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
                         } else {
@@ -280,7 +280,7 @@ namespace ppbox
             info.byte_range.buf = buffer_->out_position();
 
             info.time_range.beg = 0;
-            info.time_range.end = ppbox::data::invalid_size;
+            info.time_range.end = just::data::invalid_size;
             info.time_range.pos = info.byte_range.pos * 8000 / media_info_.bitrate;
             info.time_range.buf = info.byte_range.buf * 8000 / media_info_.bitrate;
 
@@ -294,10 +294,10 @@ namespace ppbox
         }
 
         void Merger::add_strategy(
-            ppbox::data::SegmentStrategy & strategy)
+            just::data::SegmentStrategy & strategy)
         {
             strategy_->insert(strategy);
         }
 
     } // namespace merge
-} // namespace ppbox
+} // namespace just

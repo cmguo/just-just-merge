@@ -1,13 +1,13 @@
 // MergeStatistic.h
 
-#ifndef   _PPBOX_SEGMENT_MERGE_STATISTIC_H_
-#define   _PPBOX_SEGMENT_MERGE_STATISTIC_H_
+#ifndef   _JUST_SEGMENT_MERGE_STATISTIC_H_
+#define   _JUST_SEGMENT_MERGE_STATISTIC_H_
 
-#include "ppbox/merge/MergerBase.h"
+#include "just/merge/MergerBase.h"
 
-#include <ppbox/avbase/StreamStatistic.h>
+#include <just/avbase/StreamStatistic.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
@@ -34,7 +34,7 @@ namespace ppbox
         };
 
         class MergeStatistic
-            : public ppbox::avbase::StreamStatistic
+            : public just::avbase::StreamStatistic
         {
         public:
             MergeStatistic(
@@ -49,4 +49,4 @@ namespace ppbox
     }
 }
 
-#endif // END _PPBOX_SEGMENT_JOIN_STATISTIC_H_
+#endif // END _JUST_SEGMENT_JOIN_STATISTIC_H_

@@ -1,9 +1,9 @@
 // MergeStatistic.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/MergeStatistic.h"
+#include "just/merge/Common.h"
+#include "just/merge/MergeStatistic.h"
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {

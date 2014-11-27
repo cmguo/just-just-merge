@@ -1,17 +1,17 @@
 // BigTailStrategy.cpp
 
-#include "ppbox/merge/Common.h"
-#include "ppbox/merge/mp4/BigTailStrategy.h"
+#include "just/merge/Common.h"
+#include "just/merge/mp4/BigTailStrategy.h"
 
-#include <ppbox/data/base/Error.h>
+#include <just/data/base/Error.h>
 
-namespace ppbox
+namespace just
 {
     namespace merge
     {
 
         BigTailStrategy::BigTailStrategy(
-            ppbox::data::SegmentMedia & media)
+            just::data::SegmentMedia & media)
             : SegmentStrategy(media)
         {
         }
@@ -21,20 +21,20 @@ namespace ppbox
         }
 
         bool BigTailStrategy::next_segment(
-            ppbox::data::SegmentPosition & pos, 
+            just::data::SegmentPosition & pos, 
             boost::system::error_code & ec)
         {
             if (pos.item_context == NULL || pos.index == size_t(-1)) {
                 pos.item_context = this;
-                ppbox::data::MediaInfo minfo;
+                just::data::MediaInfo minfo;
                 media_.get_info(minfo, ec);
-                ppbox::data::SegmentInfo sinfo;
+                just::data::SegmentInfo sinfo;
                 if (!media_.segment_info(media_.segment_count() - 1, sinfo, ec)) {
                     return false;
                 }
                 pos.index = 0;
                 pos.size = minfo.file_size;
-                if (pos.size == ppbox::data::invalid_size) {
+                if (pos.size == just::data::invalid_size) {
                     pos.size = sinfo.offset + sinfo.size - sinfo.head_size;
                 }
                 pos.byte_range.before_next();
@@ -48,13 +48,13 @@ namespace ppbox
                 ec.clear();
                 return true;
             } else {
-                ec = ppbox::data::error::no_more_segment;
+                ec = just::data::error::no_more_segment;
                 return false;
             }
         }
 
         bool BigTailStrategy::get_url(
-            ppbox::data::SegmentPosition const & pos, 
+            just::data::SegmentPosition const & pos, 
             framework::string::Url & url, 
             boost::system::error_code & ec)
         {
@@ -62,4 +62,4 @@ namespace ppbox
         }
 
     } // namespace data
-} // namespace ppbox
+} // namespace just
