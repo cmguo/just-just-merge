@@ -72,19 +72,20 @@ namespace just
             }
         }
 
-        error_code MergeModule::startup()
+        bool MergeModule::startup(
+            error_code & ec)
         {
-            error_code ec;
-            return ec;
+            return true;
         }
 
-        void MergeModule::shutdown()
+        bool MergeModule::shutdown(
+            error_code & ec)
         {
             boost::mutex::scoped_lock lock(mutex_);
-            error_code ec;
             for (size_t i = mergers_.size() - 1; i != (size_t)-1; --i) {
                 mergers_[i]->merger->cancel(ec);
             }
+            return true;
         }
 
         MergerBase * MergeModule::create(
