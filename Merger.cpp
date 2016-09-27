@@ -72,8 +72,6 @@ namespace just
             }
             if (source_) {
                 source_->close(ec);
-                util::stream::UrlSource * source = const_cast<util::stream::UrlSource *>(&source_->source());
-                util::stream::UrlSourceFactory::destroy(source);
                 delete source_;
                 source_ = NULL;
             }
@@ -99,22 +97,9 @@ namespace just
                 case media_open:
                     {
                         strategy_ = new ListStrategy(media_);
-                        util::stream::UrlSource * source = 
-                            util::stream::UrlSourceFactory::create(get_io_service(), media_.get_protocol(), ec);
-                        if (source == NULL) {
-                            source = util::stream::UrlSourceFactory::create(get_io_service(), media_.segment_protocol(), ec);
-                        }
-                        if (source) {
-                            boost::system::error_code ec;
-                            source->set_non_block(true, ec);
-                            source_ = new just::data::SegmentSource(*strategy_, *source);
-                            source_->set_time_out(5000);
-                            buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
-                        } else {
-                            StreamStatistic::open_end();
-                            response(ec);
-                            break;
-                        }
+                        source_ = new just::data::SegmentSource (get_io_service() ,*strategy_);
+                        source_->set_time_out(5000);
+                        buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
                     }
                     open_state_ = merger_open;
                     MergeStatistic::open_beg_stream();
