@@ -3,7 +3,7 @@
 #ifndef _JUST_MERGE_MERGE_BASE_H_
 #define _JUST_MERGE_MERGE_BASE_H_
 
-#include <just/data/base/DataStat.h>
+#include <just/avbase/DataStat.h>
 #include <just/data/segment/SegmentInfo.h>
 
 #include <just/avbase/MediaInfo.h>
@@ -16,7 +16,7 @@ namespace just
     namespace merge
     {
 
-        using just::data::DataStat;
+        using just::avbase::DataStat;
         using just::data::SegmentInfo;
 
         using just::avbase::MediaInfo;
