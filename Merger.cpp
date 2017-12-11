@@ -2,7 +2,7 @@
 
 #include "just/merge/Common.h"
 #include "just/merge/Merger.h"
-
+#include "just/merge/MergeError.h"
 #include <just/data/base/Error.h>
 #include <just/data/segment/SegmentSource.h>
 #include <just/data/segment/SegmentStrategy.h>
@@ -38,6 +38,8 @@ namespace just
             , seek_pending_(false)
             , read_size_(4 * 1024)
         {
+            boost::system::error_code bind_ec;
+            media_.bind_stream_statistic(*this, bind_ec);
         }
 
         Merger::~Merger()
@@ -97,7 +99,13 @@ namespace just
                 case media_open:
                     {
                         strategy_ = new ListStrategy(media_);
-                        source_ = new just::data::SegmentSource (get_io_service() ,*strategy_);
+                        util::stream::UrlSource * source = util::stream::UrlSourceFactory::create(get_io_service(), media_.get_protocol(), ec);
+                        if (source){
+                            boost::system::error_code ec1;
+                            source->set_non_block(true, ec1);
+                        }
+                        ec.clear();
+                        source_ = new just::data::SegmentSource (get_io_service() ,*strategy_, source);
                         source_->set_time_out(5000);
                         buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
                     }
@@ -216,6 +224,8 @@ namespace just
                 } else {
                     buffer_->read_next(read_.time_range.end, ec);
                     byte_seek(read_.time_range.big_end(), ec);
+                    if (ec == just::data::error::no_more_segment)
+                        ec = error::end_of_file;
                 }
             }
 
