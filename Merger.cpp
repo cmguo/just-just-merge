@@ -106,7 +106,8 @@ namespace just
                         }
                         ec.clear();
                         source_ = new just::data::SegmentSource (get_io_service() ,*strategy_, source);
-                        source_->set_time_out(5000);
+                        source_->set_time_out(10000);
+                        source_->set_max_try(size_t(-1));
                         buffer_ = new SegmentBuffer(*source_, 10 * 1024 * 1024, 10240);
                     }
                     open_state_ = merger_open;
