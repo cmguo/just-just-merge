@@ -153,6 +153,8 @@ namespace just
             boost::system::error_code & ec)
         {
             if (!strategy_->time_seek(offset, read_, ec)) {
+                if (ec == just::data::error::no_more_segment)
+                    ec = error::end_of_file;
                 MergeStatistic::seek(false, offset);
                 return false;
             }
